@@ -162,8 +162,8 @@ export default function PrintStudioPage() {
             <div className="space-y-4">
               {/* Row 1: 2x Care Card (9x9 cm) */}
               <div className="grid grid-cols-2 gap-3 justify-items-center">
-                <CareCard batchDate={batchDate} isEco={isEco} crop={showCropMarks} />
-                <CareCard batchDate={batchDate} isEco={isEco} crop={showCropMarks} />
+                <CareCard isEco={isEco} crop={showCropMarks} />
+                <CareCard isEco={isEco} crop={showCropMarks} />
               </div>
 
               {/* Row 2: 2x Thank You Card (9x9 cm) */}
@@ -192,10 +192,10 @@ export default function PrintStudioPage() {
 
               {/* Row 4: 4x Box Seal Stickers */}
               <div className="grid grid-cols-2 gap-3 justify-items-center">
-                <BoxSealSticker batchDate={batchDate} isEco={isEco} crop={showCropMarks} />
-                <BoxSealSticker batchDate={batchDate} isEco={isEco} crop={showCropMarks} />
-                <BoxSealSticker batchDate={batchDate} isEco={isEco} crop={showCropMarks} />
-                <BoxSealSticker batchDate={batchDate} isEco={isEco} crop={showCropMarks} />
+                <BoxSealSticker isEco={isEco} crop={showCropMarks} />
+                <BoxSealSticker isEco={isEco} crop={showCropMarks} />
+                <BoxSealSticker isEco={isEco} crop={showCropMarks} />
+                <BoxSealSticker isEco={isEco} crop={showCropMarks} />
               </div>
             </div>
           )}
@@ -203,7 +203,7 @@ export default function PrintStudioPage() {
           {sheetMode === "care" && (
             <div className="grid grid-cols-2 gap-4 justify-items-center">
               {Array.from({ length: 6 }).map((_, i) => (
-                <CareCard key={i} batchDate={batchDate} isEco={isEco} crop={showCropMarks} />
+                <CareCard key={i} isEco={isEco} crop={showCropMarks} />
               ))}
             </div>
           )}
@@ -236,7 +236,6 @@ export default function PrintStudioPage() {
               {Array.from({ length: 10 }).map((_, i) => (
                 <BoxSealSticker
                   key={i}
-                  batchDate={batchDate}
                   isEco={isEco}
                   crop={showCropMarks}
                 />
@@ -261,11 +260,9 @@ export default function PrintStudioPage() {
    1. CARE CARD (90mm x 90mm — Pas di dalam Box Bento 10 cm)
    ============================================================================ */
 function CareCard({
-  batchDate,
   isEco,
   crop,
 }: {
-  batchDate: string;
   isEco: boolean;
   crop: boolean;
 }) {
@@ -340,8 +337,9 @@ function CareCard({
           <p className="font-bold text-[#00332A]">
             Tanpa pengawet · Tahan 4–5 hari di chiller
           </p>
-          <p className="text-[#687E6C] mt-0.5">
-            Dipanggang: <span className="font-bold text-[#00332A]">{batchDate}</span>
+          <p className="text-[#687E6C] mt-1 flex items-end gap-1">
+            <span>Dipanggang:</span>
+            <span className="inline-block w-24 border-b border-dotted border-[#687E6C]/80" />
           </p>
         </div>
         <span className="font-holiday text-xl leading-none text-[#0E5B44] shrink-0">
@@ -497,11 +495,9 @@ function GiftNoteCard({
    4. BOX SEAL / BELLY BAND STICKER (90mm x 32mm)
    ============================================================================ */
 function BoxSealSticker({
-  batchDate,
   isEco,
   crop,
 }: {
-  batchDate: string;
   isEco: boolean;
   crop: boolean;
 }) {
@@ -546,8 +542,12 @@ function BoxSealSticker({
         }`}
       >
         <p className="uppercase tracking-wider opacity-75">Batch</p>
-        <p className="font-bold mt-0.5">{batchDate}</p>
-        <p className={`mt-1 ${isEco ? "text-[#0E5B44]" : "text-[#C4DE6E]"}`}>
+        <div
+          className={`w-16 h-3.5 mt-0.5 ml-auto border-b border-dotted ${
+            isEco ? "border-[#00332A]/60" : "border-[#F4F1E8]/60"
+          }`}
+        />
+        <p className={`mt-1.5 ${isEco ? "text-[#0E5B44]" : "text-[#C4DE6E]"}`}>
           2–6°C Chiller
         </p>
       </div>
