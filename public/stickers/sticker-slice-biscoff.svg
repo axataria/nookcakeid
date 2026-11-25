@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 220" width="100%" height="100%">
+  <defs>
+    <filter id="stickerShadow3" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#00332A" flood-opacity="0.28" />
+    </filter>
+    <linearGradient id="biscoffDrip" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#C2410C" />
+      <stop offset="60%" stop-color="#EA580C" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+    <linearGradient id="biscoffCustard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDF7" />
+      <stop offset="40%" stop-color="#FEF3C7" />
+      <stop offset="80%" stop-color="#FED7AA" />
+      <stop offset="100%" stop-color="#F97316" />
+    </linearGradient>
+  </defs>
+
+  <!-- Sticker White Die-cut Contour -->
+  <g filter="url(#stickerShadow3)">
+    <path d="M 120 18 L 216 112 C 220 148, 178 184, 126 198 L 24 164 L 32 108 Z" 
+          fill="#FFFFFF" stroke="#FFFFFF" stroke-width="12" stroke-linejoin="round" />
+  </g>
+
+  <!-- Base -->
+  <path d="M 28 162 L 126 196 C 174 182, 214 146, 212 114 L 208 126 C 170 162, 122 176, 30 148 Z" fill="#2E1B10" />
+
+  <!-- Custard -->
+  <path d="M 120 24 L 28 112 L 28 160 L 126 192 Z" fill="url(#biscoffCustard)" stroke="#C2410C" stroke-width="0.75" />
+  <ellipse cx="68" cy="136" rx="24" ry="14" fill="#FDBA74" opacity="0.7" />
+
+  <!-- Burnt Top -->
+  <path d="M 120 24 C 158 54, 186 78, 214 112 C 182 138, 152 168, 126 192 C 122 142, 120 78, 120 24 Z" fill="#3D1A0A" />
+
+  <!-- Thick Glossy Biscoff Spread Layer on Top -->
+  <path d="M 120 26 C 150 56, 178 78, 206 112 C 180 134, 152 162, 126 186 C 122 140, 120 78, 120 26 Z" fill="url(#biscoffDrip)" opacity="0.92" />
+  
+  <!-- Drips down the cut face -->
+  <path d="M 120 26 Q 105 50 102 74 Q 100 86 94 88 Q 90 82 86 64 Z" fill="url(#biscoffDrip)" />
+  <path d="M 78 58 Q 72 82 68 96 Q 64 104 60 98 Q 56 86 52 78 Z" fill="url(#biscoffDrip)" />
+
+  <!-- Biscoff Speculoos Biscuit on Top -->
+  <g transform="translate(146, 94) rotate(22)">
+    <rect width="36" height="18" rx="3" fill="#B45309" stroke="#92400E" stroke-width="1.5" />
+    <circle cx="8" cy="9" r="1.5" fill="#78350F" />
+    <circle cx="18" cy="9" r="1.5" fill="#78350F" />
+    <circle cx="28" cy="9" r="1.5" fill="#78350F" />
+  </g>
+
+  <!-- Crumb sprinkles -->
+  <circle cx="134" cy="80" r="2.5" fill="#B45309" />
+  <circle cx="178" cy="134" r="3" fill="#B45309" />
+  <circle cx="138" cy="138" r="2" fill="#D97706" />
+
+  <!-- Sticker Ribbon -->
+  <g transform="translate(14, 172) rotate(-8)">
+    <rect width="96" height="20" rx="4" fill="#C2410C" stroke="#FFFFFF" stroke-width="2" />
+    <text x="48" y="14" font-family="'Space Mono', monospace" font-size="8.5" font-weight="bold" fill="#FFEDD5" text-anchor="middle">LOTUS BISCOFF</text>
+  </g>
+</svg>

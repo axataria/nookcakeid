@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 220" width="100%" height="100%">
+  <defs>
+    <filter id="stickerShadow6" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#00332A" flood-opacity="0.28" />
+    </filter>
+    <linearGradient id="chocGanache" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1C100B" />
+      <stop offset="60%" stop-color="#382015" />
+      <stop offset="100%" stop-color="#4A2B1C" />
+    </linearGradient>
+  </defs>
+
+  <g filter="url(#stickerShadow6)">
+    <path d="M 120 18 L 216 112 C 220 148, 178 184, 126 198 L 24 164 L 32 108 Z" 
+          fill="#FFFFFF" stroke="#FFFFFF" stroke-width="12" stroke-linejoin="round" />
+  </g>
+
+  <!-- Extra thick brownie base -->
+  <path d="M 28 152 L 126 186 C 174 172, 214 136, 212 104 L 208 126 C 170 162, 122 176, 30 148 Z" fill="#150A05" />
+
+  <!-- Cocoa Custard -->
+  <path d="M 120 24 L 28 112 L 28 152 L 126 186 Z" fill="#FEF3C7" stroke="#382015" stroke-width="0.75" />
+
+  <!-- Burnt Top -->
+  <path d="M 120 24 C 158 54, 186 78, 214 112 C 182 138, 152 168, 126 192 C 122 142, 120 78, 120 24 Z" fill="#1F0D05" />
+
+  <!-- Ganache Drip cascade -->
+  <path d="M 120 24 Q 104 54 100 84 Q 96 98 88 92 Q 80 72 74 60 Z" fill="url(#chocGanache)" />
+  <path d="M 72 58 Q 66 88 60 108 Q 56 116 50 110 Q 46 92 42 80 Z" fill="url(#chocGanache)" />
+
+  <!-- Glossy Chocolate curls on top -->
+  <path d="M 140 76 Q 154 68 160 82 Q 152 88 140 76 Z" fill="#1C100B" stroke="#4A2B1C" stroke-width="1" />
+  <path d="M 164 106 Q 178 98 184 112 Q 176 118 164 106 Z" fill="#1C100B" stroke="#4A2B1C" stroke-width="1" />
+  
+  <g transform="translate(14, 172) rotate(-8)">
+    <rect width="96" height="20" rx="4" fill="#2E1B10" stroke="#FFFFFF" stroke-width="2" />
+    <text x="48" y="14" font-family="'Space Mono', monospace" font-size="8.5" font-weight="bold" fill="#FED7AA" text-anchor="middle">DARK CHOCO 70%</text>
+  </g>
+</svg>

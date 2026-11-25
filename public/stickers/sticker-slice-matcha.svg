@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 220" width="100%" height="100%">
+  <defs>
+    <filter id="stickerShadow2" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#00332A" flood-opacity="0.28" />
+    </filter>
+    <linearGradient id="matchaCrust" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#141E0F" />
+      <stop offset="50%" stop-color="#2D441E" />
+      <stop offset="100%" stop-color="#4D7C0F" />
+    </linearGradient>
+    <linearGradient id="matchaCustard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ECFCCB" />
+      <stop offset="30%" stop-color="#D9F99D" />
+      <stop offset="70%" stop-color="#84CC16" />
+      <stop offset="100%" stop-color="#4D7C0F" />
+    </linearGradient>
+    <linearGradient id="blondieBase" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3F2E18" />
+      <stop offset="100%" stop-color="#271C0F" />
+    </linearGradient>
+  </defs>
+
+  <!-- Sticker White Die-cut Contour -->
+  <g filter="url(#stickerShadow2)">
+    <path d="M 120 18 L 216 112 C 220 148, 178 184, 126 198 L 24 164 L 32 108 Z" 
+          fill="#FFFFFF" stroke="#FFFFFF" stroke-width="12" stroke-linejoin="round" />
+  </g>
+
+  <!-- Base -->
+  <path d="M 28 162 L 126 196 C 174 182, 214 146, 212 114 L 208 126 C 170 162, 122 176, 30 148 Z" fill="url(#blondieBase)" />
+
+  <!-- Matcha Custard Interior -->
+  <path d="M 120 24 L 28 112 L 28 160 L 126 192 Z" fill="url(#matchaCustard)" stroke="#3F6212" stroke-width="0.75" />
+  <ellipse cx="68" cy="136" rx="24" ry="14" fill="#A3E635" opacity="0.6" filter="blur(2px)" />
+  <ellipse cx="66" cy="136" rx="12" ry="7" fill="#F7FEE7" opacity="0.7" />
+
+  <!-- Caramelized Matcha Top -->
+  <path d="M 120 24 C 158 54, 186 78, 214 112 C 182 138, 152 168, 126 192 C 122 142, 120 78, 120 24 Z" fill="url(#matchaCrust)" />
+
+  <ellipse cx="152" cy="92" rx="14" ry="9" fill="#141E0F" opacity="0.85" />
+  <ellipse cx="176" cy="130" rx="11" ry="6" fill="#141E0F" opacity="0.9" />
+  
+  <!-- Matcha Dust specks -->
+  <circle cx="136" cy="110" r="3" fill="#A3E635" opacity="0.8" />
+  <circle cx="164" cy="74" r="2.5" fill="#A3E635" opacity="0.8" />
+  <circle cx="178" cy="104" r="3.5" fill="#A3E635" opacity="0.8" />
+
+  <!-- Sticker Ribbon -->
+  <g transform="translate(14, 172) rotate(-8)">
+    <rect width="96" height="20" rx="4" fill="#365314" stroke="#FFFFFF" stroke-width="2" />
+    <text x="48" y="14" font-family="'Space Mono', monospace" font-size="8.5" font-weight="bold" fill="#ECFCCB" text-anchor="middle">UJI MATCHA</text>
+  </g>
+</svg>

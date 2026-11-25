@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 220" width="100%" height="100%">
+  <defs>
+    <filter id="stickerShadow7" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#00332A" flood-opacity="0.28" />
+    </filter>
+    <linearGradient id="caramelLava" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#D97706" />
+      <stop offset="60%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#FBBF24" />
+    </linearGradient>
+  </defs>
+
+  <g filter="url(#stickerShadow7)">
+    <path d="M 120 18 L 216 112 C 220 148, 178 184, 126 198 L 24 164 L 32 108 Z" 
+          fill="#FFFFFF" stroke="#FFFFFF" stroke-width="12" stroke-linejoin="round" />
+  </g>
+
+  <path d="M 28 162 L 126 196 C 174 182, 214 146, 212 114 L 208 126 C 170 162, 122 176, 30 148 Z" fill="#26150D" />
+  <path d="M 120 24 L 28 112 L 28 160 L 126 192 Z" fill="#FEF3C7" stroke="#D97706" stroke-width="0.75" />
+  <path d="M 120 24 C 158 54, 186 78, 214 112 C 182 138, 152 168, 126 192 C 122 142, 120 78, 120 24 Z" fill="#2B1408" />
+
+  <!-- Caramel River Drip -->
+  <path d="M 120 24 Q 106 56 102 88 Q 98 104 90 98 Q 84 76 78 64 Z" fill="url(#caramelLava)" />
+  <path d="M 76 62 Q 70 92 64 114 Q 60 122 54 116 Q 50 96 46 82 Z" fill="url(#caramelLava)" />
+
+  <!-- Flaky Sea Salt flakes -->
+  <rect x="144" y="80" width="6" height="4" rx="1" fill="#FFFFFF" opacity="0.9" transform="rotate(18 144 80)" />
+  <rect x="168" y="104" width="7" height="4.5" rx="1" fill="#FFFFFF" opacity="0.9" transform="rotate(-24 168 104)" />
+  <rect x="136" y="132" width="5.5" height="3.5" rx="1" fill="#FFFFFF" opacity="0.9" transform="rotate(32 136 132)" />
+
+  <g transform="translate(14, 172) rotate(-8)">
+    <rect width="96" height="20" rx="4" fill="#B45309" stroke="#FFFFFF" stroke-width="2" />
+    <text x="48" y="14" font-family="'Space Mono', monospace" font-size="8.5" font-weight="bold" fill="#FEF3C7" text-anchor="middle">SEA SALT CARAMEL</text>
+  </g>
+</svg>

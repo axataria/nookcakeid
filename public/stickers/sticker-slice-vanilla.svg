@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 220" width="100%" height="100%">
+  <defs>
+    <filter id="stickerShadow11" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#00332A" flood-opacity="0.28" />
+    </filter>
+    <linearGradient id="vanillaCrust" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#261005" />
+      <stop offset="50%" stop-color="#4D260D" />
+      <stop offset="100%" stop-color="#9A4D17" />
+    </linearGradient>
+    <linearGradient id="vanillaCustard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="40%" stop-color="#FEF9E7" />
+      <stop offset="80%" stop-color="#FDF0C2" />
+      <stop offset="100%" stop-color="#F6DF90" />
+    </linearGradient>
+    <linearGradient id="vanillaBase" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4B2C19" />
+      <stop offset="100%" stop-color="#2D170B" />
+    </linearGradient>
+  </defs>
+
+  <g filter="url(#stickerShadow11)">
+    <path d="M 120 18 L 216 112 C 220 148, 178 184, 126 198 L 24 164 L 32 108 Z" 
+          fill="#FFFFFF" stroke="#FFFFFF" stroke-width="12" stroke-linejoin="round" />
+  </g>
+
+  <!-- Base -->
+  <path d="M 28 162 L 126 196 C 174 182, 214 146, 212 114 L 208 126 C 170 162, 122 176, 30 148 Z" fill="url(#vanillaBase)" />
+
+  <!-- Custard Interior -->
+  <path d="M 120 24 L 28 112 L 28 160 L 126 192 Z" fill="url(#vanillaCustard)" stroke="#EAB308" stroke-width="0.75" />
+  <ellipse cx="68" cy="136" rx="26" ry="14" fill="#FEF08A" opacity="0.6" filter="blur(2px)" />
+  <ellipse cx="66" cy="136" rx="14" ry="7" fill="#FFFFFF" opacity="0.85" />
+
+  <!-- Real Vanilla Bean Specks in Custard -->
+  <circle cx="50" cy="120" r="1" fill="#2E1C0C" />
+  <circle cx="62" cy="145" r="1.2" fill="#2E1C0C" />
+  <circle cx="78" cy="130" r="1" fill="#2E1C0C" />
+  <circle cx="90" cy="155" r="1.1" fill="#2E1C0C" />
+  <circle cx="42" cy="138" r="0.9" fill="#2E1C0C" />
+  <circle cx="75" cy="165" r="1" fill="#2E1C0C" />
+
+  <!-- Scorched Top -->
+  <path d="M 120 24 C 158 54, 186 78, 214 112 C 182 138, 152 168, 126 192 C 122 142, 120 78, 120 24 Z" fill="url(#vanillaCrust)" />
+
+  <ellipse cx="146" cy="88" rx="16" ry="10" fill="#1A0A03" opacity="0.88" />
+  <ellipse cx="176" cy="132" rx="12" ry="7" fill="#1A0A03" opacity="0.9" />
+
+  <!-- Ribbon -->
+  <g transform="translate(14, 172) rotate(-8)">
+    <rect width="96" height="20" rx="4" fill="#0E5B44" stroke="#FFFFFF" stroke-width="2" />
+    <text x="48" y="14" font-family="'Space Mono', monospace" font-size="8" font-weight="bold" fill="#FAF5E4" text-anchor="middle">VANILLA BEAN</text>
+  </g>
+</svg>

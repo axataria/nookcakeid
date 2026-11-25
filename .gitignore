@@ -1,0 +1,11 @@
+node_modules/
+.next*/
+*.tsbuildinfo
+.env*
+!.env.example
+artifacts/
+
+test-results/
+playwright-report/
+.reviews/
+app-ciskek.zip
