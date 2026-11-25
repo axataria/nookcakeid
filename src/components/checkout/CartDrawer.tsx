@@ -4,7 +4,7 @@ import { Drawer } from "vaul";
 import { useCartStore } from "@/store/useCartStore";
 import { formatRupiah } from "@/lib/format";
 
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6281234567890";
+const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "6285156622944";
 
 export function CartDrawer() {
   const s = useCartStore();
@@ -86,11 +86,25 @@ export function CartDrawer() {
                 {s.items.map((i) => (
                   <article className="cart-item" key={i.cartItemId}>
                     <h3>{i.name}</h3>
-                    <p className="caption">
-                      {i.selectedAddons.map((a) => a.name).join(", ") ||
-                        "Tanpa saus tambahan"}
-                    </p>
-                    {i.customNote && <p className="text-xs text-stone-600 mt-1">Ucapan: &ldquo;{i.customNote}&rdquo;</p>}
+                    {i.selectedAddons.length > 0 ? (
+                      <div className="flex flex-wrap gap-1 mt-1 mb-1">
+                        {i.selectedAddons.map((a) => (
+                          <span
+                            key={a.sauceId}
+                            className="inline-flex items-center gap-1 text-[10px] font-mono bg-[#0E5B44]/8 border border-[#0E5B44]/30 px-1.5 py-0.5 rounded text-[#0E5B44] font-bold"
+                          >
+                            + {a.name}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="caption">Tanpa saus tambahan</p>
+                    )}
+                    {i.customNote && (
+                      <div className="text-[11px] font-mono bg-[#FAF7F0] border-l-2 border-[#0E5B44] px-2 py-1 rounded-r text-[#2E4732] mt-1.5 mb-1 italic">
+                        💌 &ldquo;{i.customNote}&rdquo;
+                      </div>
+                    )}
                     <div className="cart-row">
                       <div className="stepper">
                         <button
@@ -169,7 +183,7 @@ export function CartDrawer() {
                 </button>
                 <a
                   className="button secondary flex-1 text-xs text-center"
-                  href="https://www.instagram.com/nookandcake.id/"
+                  href="https://www.instagram.com/nookcakeid/"
                   target="_blank"
                   rel="noreferrer"
                 >

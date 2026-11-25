@@ -12,7 +12,7 @@ export default function Page() {
         pesan tersebut mengikuti kebijakan layanan Instagram. Hapus item dari
         keranjang untuk menghapus pilihan yang tersimpan.
       </p>
-      <a href="https://www.instagram.com/nookandcake.id/">
+      <a href="https://www.instagram.com/nookcakeid/">
         Hubungi nook & cake.
       </a>
     </main>

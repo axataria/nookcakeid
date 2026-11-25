@@ -114,6 +114,43 @@ export const BOM_RECIPES: Record<
       'PKG-SEAL-STICKER': 1,
     },
   },
+  // Choco Basque Bento
+  'CAKE-BENTO-CHOCO': {
+    materials: {
+      'RAW-KEJU-CALF': 100,
+      'RAW-CREAM-ANCHOR': 55,
+      'RAW-TELUR': 0.5,
+      'RAW-PONDAN': 55,
+      'RAW-BUTTER': 25,
+      'RAW-GULA': 25,
+      'RAW-COCOA-POWDER': 15,
+      'RAW-CHOC-CHIPS': 20,
+    },
+    packaging: {
+      'PKG-BOX-BAGASSE': 1,
+      'PKG-SENDOK-KAYU': 1,
+      'PKG-CARE-CARD': 1,
+      'PKG-SEAL-STICKER': 1,
+    },
+  },
+  // Whole Basque 18cm
+  'CAKE-WHOLE-18CM': {
+    materials: {
+      'RAW-KEJU-CALF': 480,
+      'RAW-CREAM-ANCHOR': 260,
+      'RAW-TELUR': 2.5,
+      'RAW-PONDAN': 260,
+      'RAW-BUTTER': 120,
+      'RAW-GULA': 120,
+    },
+    packaging: {
+      'PKG-BOX-KRAFT': 1,
+      'PKG-PISAU-KUE': 1,
+      'PKG-LILIN': 1,
+      'PKG-CARE-CARD': 1,
+      'PKG-SEAL-STICKER': 1,
+    },
+  },
 };
 
 export const RAW_MATERIAL_NAMES: Record<string, { name: string; unit: 'GRAM' | 'PIECE' | 'ML' }> = {

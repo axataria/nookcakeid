@@ -1,7 +1,7 @@
 import Link from "next/link";
+import Image from "next/image";
 import { CuttingMatHero } from "@/components/hero/CuttingMatHero";
 import { MatFeatures } from "@/components/showcase/MatFeatures";
-import { WidgetMarquee } from "@/components/showcase/WidgetMarquee";
 import { CakeCatalog } from "@/components/catalog/CakeCatalog";
 import { BakerManifesto } from "@/components/showcase/BakerManifesto";
 import { CartBottomBar } from "@/components/checkout/CartBottomBar";
@@ -20,27 +20,45 @@ export default function HomePage() {
         {/* 2. THREE-COLUMN FEATURES WITH STICKER TOPPERS */}
         <MatFeatures />
 
-        {/* 3. DUAL-ROW CONTINUOUS MARQUEE GALLERY */}
-        <WidgetMarquee />
-
-        {/* 4. BAKERY DESK CATALOG */}
+        {/* 3. BAKERY DESK CATALOG */}
         <CakeCatalog />
 
-        {/* 5. BAKER'S MANIFESTO & SIGNATURE */}
+        {/* 4. BAKER'S MANIFESTO & SIGNATURE */}
         <BakerManifesto />
 
         {/* 6. FAQ & FOOTER */}
-        <footer className="bg-[#EAE5D8] py-16 border-t border-[#00332A]/10">
-          <div className="w-[min(1240px,calc(100%-48px))] mx-auto">
+        <footer className="relative overflow-hidden bg-[#EAE5D8] pt-16 pb-20 sm:pb-24 border-t border-[#00332A]/10">
+          {/* Oversized brand watermark */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none select-none absolute inset-x-0 bottom-0 z-0 flex justify-center overflow-hidden"
+          >
+            <Image
+              src="/footer-watermark.webp"
+              alt=""
+              width={1024}
+              height={237}
+              className="w-[104%] max-w-none sm:w-full h-auto object-contain opacity-65"
+            />
+          </div>
+
+          <div className="relative z-10 w-[min(1240px,calc(100%-48px))] mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16">
               <div>
                 <Link
                   href="/"
-                  className="font-display font-extrabold text-3xl tracking-tight text-[#00332A]"
+                  aria-label="nook cake, beranda"
+                  className="inline-block hover:opacity-85 transition-opacity"
                 >
-                  nook & cake.
+                  <Image
+                    src="/logo.png"
+                    alt="nook cake"
+                    width={1014}
+                    height={595}
+                    className="h-14 sm:h-16 w-auto object-contain"
+                  />
                 </Link>
-                <p className="font-mono text-xs sm:text-sm text-[#2E4732] mt-4 leading-relaxed max-w-sm">
+                <p className="font-mono text-xs sm:text-sm text-[#2E4732] mt-3 leading-relaxed max-w-sm">
                   Basque cheesecake & brownies.
                   <br />
                   your sweetest little escape.
@@ -48,15 +66,15 @@ export default function HomePage() {
                 <div className="mt-6 flex flex-wrap gap-4">
                   <a
                     className="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-[#0E5B44] hover:underline"
-                    href="https://www.instagram.com/nookandcake.id/"
+                    href="https://www.instagram.com/nookcakeid/"
                     target="_blank"
                     rel="noreferrer"
                   >
-                    @nookandcake.id ↗
+                    @nookcakeid ↗
                   </a>
                   <a
                     className="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-[#0E5B44] hover:underline"
-                    href="https://wa.me/6281234567890"
+                    href="https://wa.me/6285156622944"
                     target="_blank"
                     rel="noreferrer"
                   >

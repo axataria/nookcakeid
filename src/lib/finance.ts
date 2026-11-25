@@ -74,6 +74,28 @@ export const FINANCIAL_MASTER: Record<string, ProductFinancials> = {
     grossProfit: 32460,
     grossMarginPct: 49.94,
   },
+  'CAKE-BENTO-CHOCO': {
+    sku: 'CAKE-BENTO-CHOCO',
+    name: 'The Choco Basque (10 cm)',
+    sellingPrice: 40000,
+    foodCost: 19800,
+    packagingCost: 2640,
+    overheadCost: 1400,
+    totalHpp: 23840,
+    grossProfit: 16160,
+    grossMarginPct: 40.4,
+  },
+  'CAKE-WHOLE-18CM': {
+    sku: 'CAKE-WHOLE-18CM',
+    name: 'The Whole Basque (18 cm)',
+    sellingPrice: 195000,
+    foodCost: 75000,
+    packagingCost: 8500,
+    overheadCost: 4500,
+    totalHpp: 88000,
+    grossProfit: 107000,
+    grossMarginPct: 54.87,
+  },
 };
 
 export const MONTHLY_FIXED_OPEX = 1250000; // Rp 1.250.000 / month (Electricity, WiFi, Chiller, Domain)

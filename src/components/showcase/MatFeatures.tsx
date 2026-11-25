@@ -11,9 +11,9 @@ export function MatFeatures() {
       width: 76,
       height: 76,
       rotate: -8,
-      title: "Dipanggang Harian, Dari Nol",
+      title: "Dipanggang Setiap Hari",
       description:
-        "Tanpa pengawet, tanpa batch pabrik. Keju Calf premium, Anchor cream, dan telur segar dipanggang setiap pagi untuk aroma karamel panggang yang harum.",
+        "Tanpa pengawet, tanpa stok lama. Setiap loyang dipanggang baru setiap pagi supaya aromanya tetap wangi dan teksturnya pas.",
     },
     {
       sticker: "/stickers/orange-slice.png",
@@ -23,7 +23,7 @@ export function MatFeatures() {
       rotate: 12,
       title: "Satu Kue, Dua Tekstur",
       description:
-        "Nikmati langsung dari chiller untuk custard padat yang kokoh, atau diamkan 15 menit di suhu ruang untuk lelehan molten center yang lembut dan creamy.",
+        "Langsung makan dari kulkas kalau suka tekstur yang padat, atau diamkan 15 menit di suhu ruang buat tengahnya yang lebih lumer.",
     },
     {
       sticker: "/stickers/hibiscus-flower.png",
@@ -31,9 +31,9 @@ export function MatFeatures() {
       width: 72,
       height: 70,
       rotate: -6,
-      title: "Pesan Cepat 1-Ketuk",
+      title: "Pesan Langsung via WhatsApp",
       description:
-        "Pilih bento atau loyang besar, tambahkan saus cocolan artisan, lalu kirim ringkasan langsung ke WhatsApp baker dalam satu sentuhan tanpa registrasi rumit.",
+        "Pilih ukuran bento atau loyang utuh, tambah saus kalau mau, lalu kirim ringkasannya ke WhatsApp tanpa perlu daftar akun.",
     },
   ];
 
@@ -42,10 +42,10 @@ export function MatFeatures() {
       <div className="w-[min(1240px,calc(100%-48px))] mx-auto">
         <div className="text-center max-w-xl mx-auto mb-16">
           <p className="font-mono text-xs uppercase tracking-widest text-[#0E5B44] font-bold mb-3">
-            01 / Seni Membuat Kue Rumahan
+            01 / Cara Kami Bikin Kue
           </p>
           <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-[#00332A] tracking-tight">
-            Kue yang dibuat pelan, dinikmati tanpa tergesa.
+            Dibuat dalam jumlah terbatas, dipanggang setiap hari.
           </h2>
         </div>
 

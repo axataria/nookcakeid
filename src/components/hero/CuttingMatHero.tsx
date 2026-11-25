@@ -99,11 +99,18 @@ export function CuttingMatHero() {
       <div className="w-[min(1240px,calc(100%-48px))] mx-auto flex flex-col items-center gap-6">
         <header className="w-full flex items-center justify-between py-2">
           <Link
-            className="font-display font-extrabold text-2xl md:text-3xl tracking-tight text-[#00332A] hover:opacity-85 transition-opacity"
             href="/"
-            aria-label="nook and cake, beranda"
+            aria-label="nook cake, beranda"
+            className="inline-flex items-center hover:opacity-85 transition-opacity"
           >
-            nook & cake.
+            <Image
+              src="/logo.png"
+              alt="nook cake"
+              width={1014}
+              height={595}
+              priority
+              className="h-11 sm:h-12 md:h-14 w-auto object-contain"
+            />
           </Link>
           <nav aria-label="Navigasi utama" className="flex items-center gap-5">
             <a
@@ -203,7 +210,7 @@ export function CuttingMatHero() {
                 height={18}
                 className="opacity-75 inline-block"
               />
-              <span>Bento mulai Rp 52.000 · Kemasan eco bagasse termasuk</span>
+              <span>Bento mulai Rp 35.000 · Kemasan eco bagasse termasuk</span>
               <Image
                 src="/stickers/fern-leaf.png"
                 alt="Fern leaf"

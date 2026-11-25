@@ -12,7 +12,7 @@ export default function OrderTrackingPage() {
       </p>
       <a
         className="button primary"
-        href="https://www.instagram.com/nookandcake.id/"
+        href="https://www.instagram.com/nookcakeid/"
         target="_blank"
         rel="noreferrer"
       >

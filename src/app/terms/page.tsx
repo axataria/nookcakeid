@@ -13,7 +13,7 @@ export default function Page() {
         melalui Instagram sebelum membayar. Situs ini belum menerima pembayaran
         online.
       </p>
-      <a href="https://www.instagram.com/nookandcake.id/">
+      <a href="https://www.instagram.com/nookcakeid/">
         Hubungi nook & cake.
       </a>
     </main>

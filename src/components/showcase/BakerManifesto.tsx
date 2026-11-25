@@ -1,47 +1,77 @@
 "use client";
 import React from "react";
-import Image from "next/image";
-import { motion } from "framer-motion";
+import { Star } from "lucide-react";
+
+interface Testimonial {
+  name: string;
+  text: string;
+}
+
+const TESTIMONIALS: Testimonial[] = [
+  {
+    name: "ADC",
+    text: "Enak banget, teksturnya pas dan nggak bikin enek. Sudah pesan dua kali buat acara di rumah.",
+  },
+  {
+    name: "Mumut",
+    text: "Baru pertama kali coba yang burnt corner, ternyata cocok banget sama kopi. Packaging-nya juga rapi.",
+  },
+  {
+    name: "Tiara",
+    text: "Manisnya pas, nggak kemanisan. Yang matcha juga berasa banget tapi tetap lembut.",
+  },
+  {
+    name: "Riki",
+    text: "Pesan yang whole 18cm buat ulang tahun, semua pada suka. Pengiriman aman sampai tujuan.",
+  },
+  {
+    name: "Pelanggan",
+    text: "Bento-nya pas banget buat dimakan sendiri. Saus cokelatnya juga enak, nggak terlalu manis.",
+  },
+  {
+    name: "Pelanggan",
+    text: "Simpan di kulkas besoknya masih enak dan lembut. Pasti bakal repeat order lagi.",
+  },
+];
+
+function TestimonialCard({ item }: { item: Testimonial }) {
+  return (
+    <div className="w-[300px] sm:w-[340px] shrink-0 bg-white rounded-2xl border-2 border-[#D9D3C5] p-5 shadow-sm flex flex-col justify-between gap-4">
+      <div className="flex items-center gap-1 text-[#D97706]">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star key={i} className="w-4 h-4 fill-current" />
+        ))}
+      </div>
+      <p className="font-mono text-xs sm:text-sm text-[#2E4732] leading-relaxed">
+        &ldquo;{item.text}&rdquo;
+      </p>
+      <div className="font-display font-bold text-sm text-[#00332A] pt-2 border-t border-[#D9D3C5]/60">
+        {item.name}
+      </div>
+    </div>
+  );
+}
 
 export function BakerManifesto() {
+  const loopItems = [...TESTIMONIALS, ...TESTIMONIALS];
+
   return (
-    <section className="py-24 bg-[#EAE5D8] border-t border-[#00332A]/10">
-      <div className="w-[min(960px,calc(100%-48px))] mx-auto text-center flex flex-col items-center">
-        {/* Baker Avatar with Die-cut sticker shadow */}
-        <motion.div
-          whileHover={{ scale: 1.08, rotate: 4 }}
-          className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-[0_12px_24px_rgba(0,0,0,0.18)] mb-8"
-        >
-          <Image
-            src="/stickers/baker-avatar.jpg"
-            alt="Baker Avatar"
-            fill
-            className="object-cover"
-          />
-        </motion.div>
-
-        <p className="font-mono text-xs uppercase tracking-widest text-[#0E5B44] font-bold mb-4">
-          04 / Catatan Dari Baker
+    <section className="py-20 bg-[#EAE5D8] border-t border-[#00332A]/10 overflow-hidden">
+      <div className="w-[min(1240px,calc(100%-48px))] mx-auto text-center mb-12">
+        <p className="font-mono text-xs uppercase tracking-widest text-[#0E5B44] font-bold mb-3">
+          03 / Kata Mereka
         </p>
+        <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-[#00332A] tracking-tight">
+          Ulasan pelanggan kami.
+        </h2>
+      </div>
 
-        <blockquote className="font-display font-extrabold text-2xl sm:text-3xl md:text-4xl text-[#00332A] leading-snug tracking-tight max-w-2xl mx-auto italic">
-          &ldquo;Kue bukan sekadar makanan manis, melainkan meja kecil tempat kamu
-          diizinkan sejenak beristirahat dan menikmati hari.&rdquo;
-        </blockquote>
-
-        <p className="font-mono text-xs sm:text-sm text-[#2E4732] max-w-xl mx-auto mt-6 leading-relaxed">
-          Kami memanggang dalam jumlah yang bisa ditangani satu pasang tangan dengan
-          sungguh-sungguh. Setiap loyang punya waktu untuk matang, mendingin perlahan,
-          dan dikemas rapi untuk menemani secangkir kopi soremu.
-        </p>
-
-        {/* Cursive Handwritten Signature */}
-        <div className="mt-8 font-hand text-4xl sm:text-5xl text-[#0E5B44] rotate-[-2deg] select-none">
-          nook & cake.
+      <div className="relative w-full overflow-hidden">
+        <div className="flex gap-6 w-max animate-marquee-left hover:[animation-play-state:paused] px-3">
+          {loopItems.map((item, idx) => (
+            <TestimonialCard key={`${item.name}-${idx}`} item={item} />
+          ))}
         </div>
-        <span className="font-mono text-[11px] uppercase tracking-wider text-[#687E6C] mt-1">
-          Solo Founder & Baker · @nookandcake.id
-        </span>
       </div>
     </section>
   );

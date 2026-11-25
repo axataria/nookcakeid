@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "nook & cake. — your sweetest little escape.",
   description:
     "Basque cheesecake dan brownies dari dapur kecil nook & cake. Pilih bento, slice, atau whole cake dan minta konfirmasi tanggal pesanan.",
-  icons: { icon: "/icon.svg" },
+  icons: { icon: "/icon.svg", apple: "/icon.png" },
   openGraph: {
     title: "nook & cake. — your sweetest little escape.",
     description: "Basque cheesecake dari dapur kecil. Dibuat sesuai pesanan.",

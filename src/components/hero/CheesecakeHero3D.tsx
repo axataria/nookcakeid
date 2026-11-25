@@ -2,6 +2,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Move3d } from "lucide-react";
@@ -26,8 +27,15 @@ export function CheesecakeHero3D() {
   return (
     <section className="hero hero-parallax" aria-labelledby="hero-title">
       <header className="site-header wrap">
-        <Link className="wordmark hover:opacity-90 transition-opacity" href="/" aria-label="nook and cake, beranda">
-          nook & cake.
+        <Link className="inline-flex items-center hover:opacity-85 transition-opacity" href="/" aria-label="nook cake, beranda">
+          <Image
+            src="/logo.png"
+            alt="nook cake"
+            width={1014}
+            height={595}
+            priority
+            className="h-10 sm:h-12 w-auto object-contain"
+          />
         </Link>
         <nav aria-label="Navigasi utama" className="flex items-center gap-6">
           <a href="#menu" className="text-sm font-medium hover:text-amber-800 transition-colors">
@@ -78,7 +86,7 @@ export function CheesecakeHero3D() {
               </motion.div>
             </div>
             <p className="hero-meta">
-              Bento mulai Rp 52.000 · Kemasan bagasse termasuk
+              Bento mulai Rp 35.000 · Kemasan bagasse termasuk
             </p>
           </motion.div>
           <figure className="cake-stage">
