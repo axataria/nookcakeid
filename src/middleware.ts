@@ -16,7 +16,11 @@ const PUBLIC_BLOCKED_ADMIN_PREFIXES = [
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const host = req.headers.get("host");
+  const forwardedHost = req.headers
+    .get("x-forwarded-host")
+    ?.split(",")[0]
+    ?.trim();
+  const host = forwardedHost || req.headers.get("host") || req.nextUrl.host;
   const adminDomain = isAdminHost(host);
 
   if (adminDomain) {

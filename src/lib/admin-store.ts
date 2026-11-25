@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import crypto from "node:crypto";
 import { desc, eq } from "drizzle-orm";
@@ -93,7 +94,9 @@ export interface StoreState {
   dailySlotCapacity: number;
 }
 
-const STORE_FILE = path.join(process.cwd(), ".next", "admin-store-dev.json");
+const STORE_FILE = process.env.VERCEL
+  ? path.join(os.tmpdir(), "nook-admin-store.json")
+  : path.join(process.cwd(), ".next", "admin-store-dev.json");
 
 function getDateOffset(daysOffset: number): string {
   const d = new Date();
