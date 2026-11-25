@@ -8,12 +8,16 @@ const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "628515662294
 
 export function CartDrawer() {
   const s = useCartStore();
+  const [customerName, setCustomerName] = useState("");
+  const [nameError, setNameError] = useState(false);
   const [notice, setNotice] = useState("");
   const [copied, setCopied] = useState(false);
 
   const getOrderSummaryText = () => {
+    const trimmedName = customerName.trim();
     return [
       "Halo nook & cake! 🍰 Saya ingin memesan:",
+      ...(trimmedName ? ["", `Nama Pemesan: ${trimmedName}`] : []),
       "",
       ...s.items.map(
         (i, idx) =>
@@ -31,6 +35,11 @@ export function CartDrawer() {
   };
 
   const openWhatsApp = () => {
+    if (!customerName.trim()) {
+      setNameError(true);
+      document.getElementById("cart-customer-name")?.focus();
+      return;
+    }
     const text = getOrderSummaryText();
     const encoded = encodeURIComponent(text);
     const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encoded}`;
@@ -38,6 +47,11 @@ export function CartDrawer() {
   };
 
   async function copy() {
+    if (!customerName.trim()) {
+      setNameError(true);
+      document.getElementById("cart-customer-name")?.focus();
+      return;
+    }
     const text = getOrderSummaryText();
     try {
       await navigator.clipboard.writeText(text);
@@ -59,6 +73,7 @@ export function CartDrawer() {
         s.setIsCartDrawerOpen(open);
         setNotice("");
         setCopied(false);
+        setNameError(false);
       }}
     >
       <Drawer.Portal>
@@ -157,6 +172,35 @@ export function CartDrawer() {
                 <div className="cart-total">
                   <span>Total produk</span>
                   <strong>{formatRupiah(s.getSubtotal())}</strong>
+                </div>
+                <div className="mt-4 mb-2">
+                  <label
+                    htmlFor="cart-customer-name"
+                    className="block font-display font-bold text-xs text-[#00332A] mb-1.5"
+                  >
+                    Nama Pemesan <span className="text-[#BE123C]">*</span>
+                  </label>
+                  <input
+                    id="cart-customer-name"
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => {
+                      setCustomerName(e.target.value);
+                      if (nameError && e.target.value.trim()) setNameError(false);
+                    }}
+                    placeholder="Masukkan nama kamu..."
+                    maxLength={80}
+                    className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FAF7F0] border text-sm font-mono text-[#00332A] placeholder:text-[#687E6C]/70 focus:outline-none transition-colors ${
+                      nameError
+                        ? "border-[#BE123C] ring-1 ring-[#BE123C]/40"
+                        : "border-[#D9D3C5] focus:border-[#0E5B44]"
+                    }`}
+                  />
+                  {nameError && (
+                    <p className="mt-1 text-[11px] font-mono text-[#BE123C]">
+                      Mohon isi nama pemesan sebelum mengirim pesanan.
+                    </p>
+                  )}
                 </div>
                 <p className="caption">
                   Kemasan eco bagasse & sendok kayu sudah termasuk. Ongkir dan kurir dikonfirmasi bersama baker.

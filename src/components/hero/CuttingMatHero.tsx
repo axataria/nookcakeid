@@ -25,65 +25,55 @@ const STICKERS = [
     id: "slice-classic",
     src: "/stickers/sticker-slice-classic.png",
     alt: "The Burnt Corner Classic Slice",
-    width: 122,
-    height: 98,
-    initial: { top: "6%", left: "5%", rotate: -12 },
+    width: 112,
+    height: 90,
+    desktopOnly: false,
+    initial: { top: "9%", left: "4%", rotate: -12 },
   },
   {
     id: "slice-matcha",
     src: "/stickers/sticker-slice-matcha.png",
     alt: "Uji Matcha Basque Slice",
-    width: 120,
-    height: 96,
-    initial: { top: "5%", right: "6%", rotate: 16 },
+    width: 112,
+    height: 90,
+    desktopOnly: false,
+    initial: { top: "9%", right: "4%", rotate: 14 },
   },
   {
     id: "slice-biscoff",
     src: "/stickers/sticker-slice-biscoff.png",
     alt: "Lotus Biscoff Crunch Slice",
-    width: 122,
-    height: 98,
-    initial: { bottom: "13%", left: "6%", rotate: 10 },
+    width: 112,
+    height: 90,
+    desktopOnly: false,
+    initial: { bottom: "19%", left: "4%", rotate: 10 },
   },
   {
     id: "slice-berry",
     src: "/stickers/sticker-slice-berry.png",
     alt: "Wild Berry Compote Slice",
-    width: 120,
-    height: 96,
-    initial: { bottom: "11%", right: "5%", rotate: -14 },
+    width: 112,
+    height: 90,
+    desktopOnly: false,
+    initial: { bottom: "19%", right: "4%", rotate: -12 },
   },
   {
     id: "slice-caramel",
     src: "/stickers/sticker-slice-caramel.png",
     alt: "Sea Salt Caramel Lava Slice",
-    width: 118,
-    height: 94,
-    initial: { top: "42%", left: "3%", rotate: 20 },
+    width: 108,
+    height: 86,
+    desktopOnly: true,
+    initial: { top: "42%", left: "3%", rotate: 16 },
   },
   {
     id: "slice-chocolate",
     src: "/stickers/sticker-slice-chocolate.png",
     alt: "Dark Chocolate 70% Slice",
-    width: 120,
-    height: 96,
-    initial: { top: "40%", right: "3%", rotate: -18 },
-  },
-  {
-    id: "slice-pistachio",
-    src: "/stickers/sticker-slice-pistachio.png",
-    alt: "Pistachio Velvet Slice",
-    width: 118,
-    height: 94,
-    initial: { bottom: "8%", left: "42%", rotate: 4 },
-  },
-  {
-    id: "slice-chiller",
-    src: "/stickers/sticker-slice-chiller.png",
-    alt: "Firm Chiller 2°C Custard Slice",
-    width: 118,
-    height: 94,
-    initial: { top: "4%", left: "46%", rotate: -6 },
+    width: 110,
+    height: 88,
+    desktopOnly: true,
+    initial: { top: "42%", right: "3%", rotate: -15 },
   },
 ];
 
@@ -225,8 +215,7 @@ export function CuttingMatHero() {
         {/* 4. THE INTERACTIVE CUTTING MAT PLAYGROUND CANVAS */}
         <div
           ref={matRef}
-          className="w-full mt-6 rounded-[28px] sm:rounded-[36px] bg-[#0E5B44] border-4 border-[#0B4A37] shadow-[0_24px_50px_-12px_rgba(0,51,42,0.35)] relative overflow-hidden select-none"
-          style={{ minHeight: "560px" }}
+          className="w-full mt-6 rounded-[28px] sm:rounded-[36px] bg-[#0E5B44] border-4 border-[#0B4A37] shadow-[0_24px_50px_-12px_rgba(0,51,42,0.35)] relative overflow-hidden select-none min-h-[430px] sm:min-h-[500px] md:min-h-[550px]"
         >
           {/* Authentic Cutting Mat Metric Grid Vector */}
           <div
@@ -236,15 +225,27 @@ export function CuttingMatHero() {
             }}
           />
 
-          {/* Metric Measurement Numbers along the border */}
-          <div className="absolute top-2 left-6 right-6 flex justify-between font-mono text-[10px] text-[#C4DE6E]/60 pointer-events-none uppercase tracking-widest">
+          {/* Subtle center spotlight behind 3D cake */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 48%, rgba(196, 222, 110, 0.14) 0%, rgba(11, 74, 55, 0) 60%)",
+            }}
+          />
+
+          {/* Inner metric frame border */}
+          <div className="absolute inset-3 sm:inset-4 rounded-[20px] sm:rounded-[26px] border border-[#C4DE6E]/25 pointer-events-none" />
+
+          {/* Metric Measurement Numbers along the top border */}
+          <div className="absolute top-5 left-6 right-6 flex justify-between items-center font-mono text-[9px] sm:text-[10px] text-[#C4DE6E]/70 pointer-events-none uppercase tracking-widest">
             <span>METRIC CUTTING MAT A2</span>
-            <span>GRID SCALE 1:1</span>
-            <span>NOOK & CAKE STUDIO</span>
+            <span className="hidden sm:inline">GRID SCALE 1:1</span>
+            <span>NOOK &amp; CAKE STUDIO</span>
           </div>
 
           {/* CENTERPIECE: 3D BASQUE CHEESECAKE STAGE */}
-          <div className="relative w-full h-[540px] flex items-center justify-center z-10">
+          <div className="relative w-full h-[360px] sm:h-[440px] md:h-[500px] pb-10 sm:pb-6 flex items-center justify-center z-10">
             <HeroCanvas view={view} />
           </div>
 
@@ -266,33 +267,38 @@ export function CuttingMatHero() {
               initial={{ rotate: s.initial.rotate }}
               whileHover={{ scale: 1.12, rotate: s.initial.rotate + 6, cursor: "grab" }}
               whileDrag={{
-                scale: 1.25,
-                rotate: s.initial.rotate - 10,
+                scale: 1.22,
+                rotate: s.initial.rotate - 8,
                 cursor: "grabbing",
                 zIndex: 50,
               }}
-              className="drop-shadow-[0_12px_18px_rgba(0,0,0,0.32)] filter active:drop-shadow-[0_20px_30px_rgba(0,0,0,0.45)] transition-shadow"
+              className={`${
+                s.desktopOnly ? "hidden md:block" : "block"
+              } w-16 sm:w-24 md:w-28 drop-shadow-[0_10px_16px_rgba(0,0,0,0.32)] filter active:drop-shadow-[0_20px_30px_rgba(0,0,0,0.45)] transition-shadow`}
             >
               <Image
                 src={s.src}
                 alt={s.alt}
                 width={s.width}
                 height={s.height}
-                className="pointer-events-none select-none"
+                className="w-full h-auto pointer-events-none select-none"
                 draggable={false}
               />
             </motion.div>
           ))}
 
           {/* Mat Bottom Status Bar & View Mode Controls */}
-          <div className="absolute bottom-4 left-6 right-6 flex flex-wrap items-center justify-between gap-3 z-30 pointer-events-auto">
-            <div className="inline-flex items-center gap-2 bg-[#0B4A37]/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#C4DE6E]/30 text-xs font-mono text-[#C4DE6E]">
-              <Move3d className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Meja kerja bebas:</span> Geser stiker & putar kue 360°
+          <div className="absolute bottom-4 sm:bottom-5 left-4 right-4 sm:left-6 sm:right-6 flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3 z-30 pointer-events-auto">
+            <div className="inline-flex items-center gap-2 bg-[#073829]/85 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#C4DE6E]/30 text-[11px] sm:text-xs font-mono text-[#C4DE6E] shadow-sm">
+              <Move3d className="w-3.5 h-3.5 shrink-0" />
+              <span>
+                <span className="hidden sm:inline">Meja kerja bebas: </span>
+                Geser stiker &amp; putar kue 360°
+              </span>
             </div>
 
             <div
-              className="inline-flex items-center gap-1 bg-[#0B4A37]/90 backdrop-blur-md p-1 rounded-xl border border-[#C4DE6E]/30"
+              className="inline-flex items-center gap-1 bg-[#073829]/85 backdrop-blur-md p-1 rounded-xl border border-[#C4DE6E]/30 shadow-sm"
               role="group"
               aria-label="Tampilan cheesecake"
             >
@@ -305,9 +311,10 @@ export function CuttingMatHero() {
               ).map(([mode, label]) => (
                 <button
                   key={mode}
+                  type="button"
                   aria-pressed={view === mode}
                   onClick={() => setView(mode)}
-                  className={`px-3 py-1 text-xs font-mono font-bold rounded-lg transition-colors ${
+                  className={`px-3 py-1 text-[11px] sm:text-xs font-mono font-bold rounded-lg transition-colors ${
                     view === mode
                       ? "bg-[#C4DE6E] text-[#00332A]"
                       : "text-emerald-100/80 hover:text-white"

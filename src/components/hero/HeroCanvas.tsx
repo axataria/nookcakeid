@@ -57,7 +57,9 @@ export function HeroCanvas({ view }: Props) {
     }
     const query = matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => {
-      const hero = ref.current?.closest(".hero-parallax");
+      const hero =
+        ref.current?.closest(".hero-parallax") ||
+        ref.current?.closest("section");
       if (!hero) return;
       const rect = hero.getBoundingClientRect();
       const range = Math.max(1, rect.height - window.innerHeight);
@@ -91,7 +93,9 @@ export function HeroCanvas({ view }: Props) {
     // Global ambient pointer parallax when hovering across the hero section
     const onHeroPointerMove = (e: PointerEvent) => {
       if (query.matches || isDragging.current) return;
-      const hero = ref.current?.closest(".hero-parallax");
+      const hero =
+        ref.current?.closest(".hero-parallax") ||
+        ref.current?.closest("section");
       if (!hero) return;
       const rect = hero.getBoundingClientRect();
       if (e.clientY < rect.top || e.clientY > rect.bottom) return;
