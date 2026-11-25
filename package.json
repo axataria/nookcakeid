@@ -23,6 +23,7 @@
     "drizzle-orm": "^0.45.4",
     "framer-motion": "^12.4.7",
     "lucide-react": "^0.475.0",
+    "mysql2": "^3.24.6",
     "next": "15.5.29",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

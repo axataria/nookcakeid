@@ -96,6 +96,61 @@ export const FINANCIAL_MASTER: Record<string, ProductFinancials> = {
     grossProfit: 107000,
     grossMarginPct: 54.87,
   },
+  'CAKE-BURNT-CORNER-10CM': {
+    sku: 'CAKE-BURNT-CORNER-10CM',
+    name: 'The Burnt Corner (10 cm)',
+    sellingPrice: 35000,
+    foodCost: 14500,
+    packagingCost: 2200,
+    overheadCost: 1100,
+    totalHpp: 17800,
+    grossProfit: 17200,
+    grossMarginPct: 49.14,
+  },
+  'CAKE-MATCHA-BASQUE-10CM': {
+    sku: 'CAKE-MATCHA-BASQUE-10CM',
+    name: 'The Matcha Basque (10 cm)',
+    sellingPrice: 40000,
+    foodCost: 17200,
+    packagingCost: 2200,
+    overheadCost: 1100,
+    totalHpp: 20500,
+    grossProfit: 19500,
+    grossMarginPct: 48.75,
+  },
+  'CAKE-CHOCO-BASQUE-10CM': {
+    sku: 'CAKE-CHOCO-BASQUE-10CM',
+    name: 'The Choco Basque (10 cm)',
+    sellingPrice: 40000,
+    foodCost: 16900,
+    packagingCost: 2200,
+    overheadCost: 1100,
+    totalHpp: 20200,
+    grossProfit: 19800,
+    grossMarginPct: 49.5,
+  },
+  'SAUCE-CHOCOLATE-25ML': {
+    sku: 'SAUCE-CHOCOLATE-25ML',
+    name: 'Chocolate Ganache (25ml)',
+    sellingPrice: 10000,
+    foodCost: 3500,
+    packagingCost: 900,
+    overheadCost: 200,
+    totalHpp: 4600,
+    grossProfit: 5400,
+    grossMarginPct: 54.0,
+  },
+  'SAUCE-STRAWBERRY-25ML': {
+    sku: 'SAUCE-STRAWBERRY-25ML',
+    name: 'Selai Strawberry (25ml)',
+    sellingPrice: 10000,
+    foodCost: 3400,
+    packagingCost: 900,
+    overheadCost: 200,
+    totalHpp: 4500,
+    grossProfit: 5500,
+    grossMarginPct: 55.0,
+  },
 };
 
 export const MONTHLY_FIXED_OPEX = 1250000; // Rp 1.250.000 / month (Electricity, WiFi, Chiller, Domain)
@@ -151,4 +206,12 @@ export function calculateDailyProfit(
     netProfit,
     grossMarginPct: Math.round(grossMarginPct * 100) / 100,
   };
+}
+
+/**
+ * Return on Equity (ROE %) = (Net Profit / Total Owner Equity) * 100
+ */
+export function calculateROE(netProfit: number, totalEquity: number): number {
+  if (totalEquity <= 0) return 0;
+  return Math.round((netProfit / totalEquity) * 10000) / 100;
 }

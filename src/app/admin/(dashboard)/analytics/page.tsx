@@ -18,6 +18,7 @@ import {
   calculateDailyProfit,
 } from '@/lib/finance';
 import { formatRupiah } from '@/lib/format';
+import { RoeAndFinanceSection } from '@/components/admin/RoeAndFinanceSection';
 
 export default function AnalyticsPage() {
   // Sample month-to-date sales data
@@ -59,6 +60,8 @@ export default function AnalyticsPage() {
           </span>
         </div>
       </div>
+
+      <RoeAndFinanceSection />
 
       {/* High-Level Financial Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

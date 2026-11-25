@@ -8,23 +8,10 @@ import { Printer, ArrowLeft, Scissors, Sparkles, Leaf } from "lucide-react";
 type SheetMode = "combo" | "care" | "thanks" | "gift" | "seal";
 type InkMode = "full" | "eco";
 
-function formatTodayId(): string {
-  try {
-    return new Intl.DateTimeFormat("id-ID", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }).format(new Date());
-  } catch {
-    return "Hari ini";
-  }
-}
-
 export default function PrintStudioPage() {
   const [sheetMode, setSheetMode] = useState<SheetMode>("combo");
   const [inkMode, setInkMode] = useState<InkMode>("full");
   const [showCropMarks, setShowCropMarks] = useState(true);
-  const [batchDate, setBatchDate] = useState<string>(formatTodayId);
   const [giftTo, setGiftTo] = useState("");
   const [giftFrom, setGiftFrom] = useState("");
   const [giftMessage, setGiftMessage] = useState("");
@@ -136,51 +123,41 @@ export default function PrintStudioPage() {
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <label className="flex items-center gap-1.5 font-mono text-[11px] text-[#2E4732] bg-white px-2.5 py-1 rounded-lg border border-[#D9D3C5]">
-                <span className="font-bold text-[#0E5B44]">Batch:</span>
+            {(sheetMode === "combo" || sheetMode === "gift") && (
+              <div className="flex flex-wrap items-center gap-2">
                 <input
                   type="text"
-                  value={batchDate}
-                  onChange={(e) => setBatchDate(e.target.value)}
-                  className="w-28 bg-transparent outline-none text-[#00332A]"
-                  placeholder="25 Nov 2026"
+                  value={giftTo}
+                  onChange={(e) => setGiftTo(e.target.value)}
+                  placeholder="Untuk: (opsional)"
+                  className="font-mono text-[11px] bg-white px-2.5 py-1 rounded-lg border border-[#D9D3C5] w-32 outline-none focus:border-[#0E5B44]"
                 />
-              </label>
-
-              {(sheetMode === "combo" || sheetMode === "gift") && (
-                <>
-                  <input
-                    type="text"
-                    value={giftTo}
-                    onChange={(e) => setGiftTo(e.target.value)}
-                    placeholder="Untuk: (opsional)"
-                    className="font-mono text-[11px] bg-white px-2.5 py-1 rounded-lg border border-[#D9D3C5] w-32 outline-none focus:border-[#0E5B44]"
-                  />
-                  <input
-                    type="text"
-                    value={giftFrom}
-                    onChange={(e) => setGiftFrom(e.target.value)}
-                    placeholder="Dari: (opsional)"
-                    className="font-mono text-[11px] bg-white px-2.5 py-1 rounded-lg border border-[#D9D3C5] w-28 outline-none focus:border-[#0E5B44]"
-                  />
-                  <input
-                    type="text"
-                    value={giftMessage}
-                    onChange={(e) => setGiftMessage(e.target.value)}
-                    placeholder="Pesan singkat gift..."
-                    className="font-mono text-[11px] bg-white px-2.5 py-1 rounded-lg border border-[#D9D3C5] w-44 outline-none focus:border-[#0E5B44]"
-                  />
-                </>
-              )}
-            </div>
+                <input
+                  type="text"
+                  value={giftFrom}
+                  onChange={(e) => setGiftFrom(e.target.value)}
+                  placeholder="Dari: (opsional)"
+                  className="font-mono text-[11px] bg-white px-2.5 py-1 rounded-lg border border-[#D9D3C5] w-28 outline-none focus:border-[#0E5B44]"
+                />
+                <input
+                  type="text"
+                  value={giftMessage}
+                  onChange={(e) => setGiftMessage(e.target.value)}
+                  placeholder="Pesan singkat gift..."
+                  className="font-mono text-[11px] bg-white px-2.5 py-1 rounded-lg border border-[#D9D3C5] w-44 outline-none focus:border-[#0E5B44]"
+                />
+              </div>
+            )}
           </div>
         </div>
       </header>
 
       {/* A4 PRINT SHEET PREVIEW */}
       <main className="py-8 px-4 print:p-0 flex flex-col items-center">
-        <div className="w-[210mm] min-h-[297mm] bg-white shadow-xl print:shadow-none p-[8mm] print:p-0 mx-auto">
+        <div
+          data-sheet="a4"
+          className="w-[210mm] min-h-[297mm] bg-white shadow-xl print:shadow-none p-[8mm] print:p-0 mx-auto"
+        >
           {sheetMode === "combo" && (
             <div className="space-y-4">
               {/* Row 1: 2x Care Card (9x9 cm) */}
@@ -294,6 +271,7 @@ function CareCard({
 }) {
   return (
     <article
+      data-asset="care-card"
       className={`w-[90mm] h-[90mm] p-4 flex flex-col justify-between relative overflow-hidden ${
         crop ? "border border-dashed border-[#687E6C]/60" : ""
       } ${isEco ? "bg-white text-[#00332A]" : "bg-[#F4F1E8] text-[#00332A]"}`}
@@ -380,6 +358,7 @@ function CareCard({
 function ThankYouCard({ isEco, crop }: { isEco: boolean; crop: boolean }) {
   return (
     <article
+      data-asset="thank-you-card"
       className={`w-[90mm] h-[90mm] p-4 flex flex-col justify-between relative overflow-hidden ${
         crop ? "border border-dashed border-[#687E6C]/60" : ""
       } ${isEco ? "bg-white text-[#00332A]" : "bg-[#0E5B44] text-[#F4F1E8]"}`}
@@ -476,6 +455,7 @@ function GiftNoteCard({
 }) {
   return (
     <article
+      data-asset="gift-note-card"
       className={`w-[90mm] h-[48mm] p-3.5 flex flex-col justify-between relative ${
         crop ? "border border-dashed border-[#687E6C]/60" : ""
       } ${isEco ? "bg-white text-[#00332A]" : "bg-[#FAF7F0] text-[#00332A]"}`}
@@ -527,6 +507,7 @@ function BoxSealSticker({
 }) {
   return (
     <article
+      data-asset="box-seal-sticker"
       className={`w-[90mm] h-[32mm] px-3.5 py-2.5 flex items-center justify-between gap-3 ${
         crop ? "border border-dashed border-[#687E6C]/60" : ""
       } ${isEco ? "bg-white text-[#00332A]" : "bg-[#00332A] text-[#F4F1E8]"}`}
