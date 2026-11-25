@@ -6,31 +6,31 @@ import { motion } from "framer-motion";
 export function MatFeatures() {
   const features = [
     {
-      sticker: "/stickers/digicam.png",
-      alt: "Vintage Digicam",
-      width: 76,
-      height: 76,
-      rotate: -8,
+      sticker: "/stickers/sticker-slice-classic.png",
+      alt: "Classic Burnt Basque Cheesecake",
+      width: 112,
+      height: 90,
+      rotate: -6,
       title: "Dipanggang Setiap Hari",
       description:
         "Tanpa pengawet, tanpa stok lama. Setiap loyang dipanggang baru setiap pagi supaya aromanya tetap wangi dan teksturnya pas.",
     },
     {
-      sticker: "/stickers/orange-slice.png",
-      alt: "Clementine Slice",
-      width: 68,
-      height: 88,
-      rotate: 12,
+      sticker: "/stickers/sticker-slice-matcha.png",
+      alt: "Uji Matcha Basque Cheesecake",
+      width: 112,
+      height: 90,
+      rotate: 7,
       title: "Satu Kue, Dua Tekstur",
       description:
         "Langsung makan dari kulkas kalau suka tekstur yang padat, atau diamkan 15 menit di suhu ruang buat tengahnya yang lebih lumer.",
     },
     {
-      sticker: "/stickers/hibiscus-flower.png",
-      alt: "Hibiscus Flower",
-      width: 72,
-      height: 70,
-      rotate: -6,
+      sticker: "/stickers/sticker-slice-chocolate.png",
+      alt: "Dark Chocolate Basque Cheesecake",
+      width: 112,
+      height: 90,
+      rotate: -5,
       title: "Pesan Langsung via WhatsApp",
       description:
         "Pilih ukuran bento atau loyang utuh, tambah saus kalau mau, lalu kirim ringkasannya ke WhatsApp tanpa perlu daftar akun.",
@@ -61,6 +61,7 @@ export function MatFeatures() {
             >
               <div className="h-28 flex items-center justify-center mb-6">
                 <motion.div
+                  initial={{ rotate: f.rotate }}
                   whileHover={{ scale: 1.15, rotate: f.rotate * 1.5 }}
                   transition={{ type: "spring", stiffness: 350, damping: 20 }}
                   className="drop-shadow-[0_8px_16px_rgba(0,0,0,0.18)] cursor-pointer"

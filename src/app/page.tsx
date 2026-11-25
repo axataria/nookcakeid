@@ -31,15 +31,11 @@ export default function HomePage() {
           {/* Oversized brand watermark */}
           <div
             aria-hidden="true"
-            className="pointer-events-none select-none absolute inset-x-0 bottom-0 z-0 flex justify-center overflow-hidden"
+            className="pointer-events-none select-none absolute inset-x-0 -bottom-[3vw] sm:-bottom-[2.5vw] z-0 flex justify-center overflow-hidden"
           >
-            <Image
-              src="/footer-watermark.webp"
-              alt=""
-              width={1024}
-              height={237}
-              className="w-[104%] max-w-none sm:w-full h-auto object-contain opacity-65"
-            />
+            <span className="font-holiday text-[27vw] sm:text-[25vw] leading-[0.72] tracking-[-0.02em] whitespace-nowrap bg-gradient-to-b from-[#0E5B44]/85 via-[#0E5B44]/55 to-[#0E5B44]/25 bg-clip-text text-transparent">
+              nook cake
+            </span>
           </div>
 
           <div className="relative z-10 w-[min(1240px,calc(100%-48px))] mx-auto">

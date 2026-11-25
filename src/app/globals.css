@@ -1,6 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: "HolidayFree";
+  src: url("/fonts/HolidayFree.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-holiday {
+  font-family: "HolidayFree", cursive, sans-serif;
+}
 :root {
   --paper: #F4F1E8;
   --surface: #ffffff;
