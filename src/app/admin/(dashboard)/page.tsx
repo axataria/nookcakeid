@@ -16,6 +16,7 @@ import { QuickChatPanel } from "@/components/admin/QuickChatPanel";
 import type { OrderStatus } from "@/lib/admin-store";
 
 interface DashboardData {
+  storageEngine?: "MYSQL" | "FALLBACK";
   kpis: {
     totalRevenue: number;
     totalHpp: number;
@@ -150,14 +151,30 @@ export default function AdminDashboardPage() {
             Pantau Laba Bersih, BEP, ROE, Pipeline Pesanan &amp; Stok Real-Time.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => void loadDashboard()}
-          className="self-start sm:self-auto inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-[#D9D3C5] hover:border-[#0E5B44] text-xs font-mono font-bold text-[#00332A]"
-        >
-          <RefreshCw className="w-3.5 h-3.5" />
-          <span>Muat Ulang</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <span
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-mono font-bold border ${
+              data.storageEngine === "MYSQL"
+                ? "bg-emerald-50 border-emerald-200 text-[#0E5B44]"
+                : "bg-amber-50 border-amber-200 text-amber-800"
+            }`}
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${
+                data.storageEngine === "MYSQL" ? "bg-[#0E5B44]" : "bg-amber-500"
+              }`}
+            />
+            {data.storageEngine === "MYSQL" ? "MySQL Connected" : "Local Fallback"}
+          </span>
+          <button
+            type="button"
+            onClick={() => void loadDashboard()}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-[#D9D3C5] hover:border-[#0E5B44] text-xs font-mono font-bold text-[#00332A]"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Muat Ulang</span>
+          </button>
+        </div>
       </div>
 
       {/* 1. KPI Summary Cards */}

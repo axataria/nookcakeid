@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import crypto from "node:crypto";
 import { desc, eq } from "drizzle-orm";
-import { getDb, schema } from "@/db";
+import { getDb, isDatabaseConfigured, schema } from "@/db";
 import { calculateMovingAverageCost, calculateROE, FINANCIAL_MASTER } from "@/lib/finance";
 
 export type OrderStatus =
@@ -776,6 +776,7 @@ export async function getDashboardSummary() {
   ).length;
 
   return {
+    storageEngine: isDatabaseConfigured() ? ("MYSQL" as const) : ("FALLBACK" as const),
     kpis: {
       totalRevenue,
       totalHpp,

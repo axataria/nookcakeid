@@ -1,8 +1,3 @@
--- =====================================================================
--- NOOK & CAKE — MySQL Schema (TiDB Cloud / Aiven / MySQL 8 / cPanel)
--- Matching src/db/schema.ts
--- =====================================================================
-
 CREATE TABLE IF NOT EXISTS `raw_materials` (
   `id` VARCHAR(36) NOT NULL,
   `code` VARCHAR(50) NOT NULL,
@@ -56,14 +51,7 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `slot_date` VARCHAR(10) NOT NULL,
   `total_amount` DECIMAL(12, 2) NOT NULL,
   `total_hpp` DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
-  `status` ENUM(
-    'PENDING_PAYMENT',
-    'CONFIRMED_SLOT',
-    'BAKING',
-    'READY_FOR_DELIVERY',
-    'DELIVERED',
-    'CANCELLED'
-  ) NOT NULL DEFAULT 'PENDING_PAYMENT',
+  `status` ENUM('PENDING_PAYMENT', 'CONFIRMED_SLOT', 'BAKING', 'READY_FOR_DELIVERY', 'DELIVERED', 'CANCELLED') NOT NULL DEFAULT 'PENDING_PAYMENT',
   `notes` TEXT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -83,20 +71,13 @@ CREATE TABLE IF NOT EXISTS `order_items` (
   `subtotal` DECIMAL(12, 2) NOT NULL,
   `addons_json` TEXT NULL,
   `custom_note` TEXT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `order_items_order_id_fk`
-    FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE
+  PRIMARY KEY (`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `stock_ledger` (
   `id` VARCHAR(36) NOT NULL,
   `raw_material_id` VARCHAR(36) NOT NULL,
-  `transaction_type` ENUM(
-    'ORDER_DEDUCTION',
-    'GOODS_RECEIPT',
-    'WASTE_ADJUSTMENT',
-    'INITIAL_BALANCE'
-  ) NOT NULL,
+  `transaction_type` ENUM('ORDER_DEDUCTION', 'GOODS_RECEIPT', 'WASTE_ADJUSTMENT', 'INITIAL_BALANCE') NOT NULL,
   `quantity_change` DECIMAL(12, 3) NOT NULL,
   `balance_after` DECIMAL(12, 3) NOT NULL,
   `unit_cost` DECIMAL(12, 2) NULL,
@@ -104,9 +85,7 @@ CREATE TABLE IF NOT EXISTS `stock_ledger` (
   `reference_id` VARCHAR(100) NULL,
   `notes` TEXT NULL,
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `stock_ledger_raw_material_id_fk`
-    FOREIGN KEY (`raw_material_id`) REFERENCES `raw_materials`(`id`) ON DELETE CASCADE
+  PRIMARY KEY (`id`)
 );
 
 CREATE TABLE IF NOT EXISTS `owner_equity` (
@@ -132,9 +111,6 @@ CREATE TABLE IF NOT EXISTS `opex_expenses` (
   PRIMARY KEY (`id`)
 );
 
--- =====================================================================
--- Master Bahan Baku Awal (Stok 0 — siap diisi lewat Quick Chat)
--- =====================================================================
 INSERT IGNORE INTO `raw_materials`
   (`id`, `code`, `name`, `base_unit`, `current_stock`, `minimum_buffer`, `moving_avg_cost`, `last_purchase_price`, `storage_type`)
 VALUES
