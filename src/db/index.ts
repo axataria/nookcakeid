@@ -18,15 +18,21 @@ export function getDb(): MySql2Database<typeof schema> | null {
   if (!globalForDb.mysqlPool) {
     const needsSsl =
       url.includes("ssl-mode=REQUIRED") ||
+      url.includes("ssl=") ||
       url.includes("aivencloud.com") ||
       url.includes("tidbcloud.com");
-    const cleanUri = url.replace(/([?&])ssl-mode=[^&]*(&?)/i, (_, p1, p2) =>
-      p1 === "?" && p2 ? "?" : p1 === "&" && p2 ? "&" : "",
-    );
+    const cleanUri = url
+      .replace(/([?&])ssl-mode=[^&]*(&?)/i, (_, p1, p2) =>
+        p1 === "?" && p2 ? "?" : p1 === "&" && p2 ? "&" : "",
+      )
+      .replace(/([?&])ssl=[^&]*(&?)/i, (_, p1, p2) =>
+        p1 === "?" && p2 ? "?" : p1 === "&" && p2 ? "&" : "",
+      );
 
     globalForDb.mysqlPool = mysql.createPool({
       uri: cleanUri,
       ssl: needsSsl ? { rejectUnauthorized: false } : undefined,
+      connectTimeout: 10000,
       waitForConnections: true,
       connectionLimit: 10,
       maxIdle: 5,
