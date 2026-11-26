@@ -9,13 +9,13 @@ import {
   mysqlEnum,
 } from 'drizzle-orm/mysql-core';
 
-export const unitTypeEnum = mysqlEnum('unit_type', ['GRAM', 'PIECE', 'ML']);
-export const productVariantEnum = mysqlEnum('product_variant', [
+export const unitTypeEnum = mysqlEnum('base_unit', ['GRAM', 'PIECE', 'ML']);
+export const productVariantEnum = mysqlEnum('variant', [
   'SLICE',
   'BENTO',
   'WHOLE',
 ]);
-export const orderStatusEnum = mysqlEnum('order_status', [
+export const orderStatusEnum = mysqlEnum('status', [
   'PENDING_PAYMENT',
   'CONFIRMED_SLOT',
   'BAKING',
@@ -23,19 +23,19 @@ export const orderStatusEnum = mysqlEnum('order_status', [
   'DELIVERED',
   'CANCELLED',
 ]);
-export const ledgerTypeEnum = mysqlEnum('ledger_type', [
+export const ledgerTypeEnum = mysqlEnum('transaction_type', [
   'ORDER_DEDUCTION',
   'GOODS_RECEIPT',
   'WASTE_ADJUSTMENT',
   'INITIAL_BALANCE',
 ]);
-export const equityCategoryEnum = mysqlEnum('equity_category', [
+export const equityCategoryEnum = mysqlEnum('category', [
   'EQUIPMENT',
   'WORKING_CAPITAL',
   'RENOVATION',
   'OTHER',
 ]);
-export const opexCategoryEnum = mysqlEnum('opex_category', [
+export const opexCategoryEnum = mysqlEnum('category', [
   'RENT',
   'UTILITIES',
   'MARKETING',
