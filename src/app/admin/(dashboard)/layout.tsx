@@ -15,6 +15,7 @@ import {
   LogOut,
   Menu,
   X,
+  Printer,
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -57,6 +58,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       href: '/analytics',
       icon: TrendingUp,
       badge: 'ROE',
+    },
+    {
+      label: 'Print & Ucapan',
+      href: '/print',
+      icon: Printer,
+      badge: 'A4',
     },
   ];
 
@@ -222,6 +229,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <TrendingUp className="w-4 h-4 text-[#0E5B44]" />
               <span>Profit, OPEX &amp; ROE</span>
+            </Link>
+            <Link
+              href="/print"
+              onClick={() => setMoreOpen(false)}
+              className="flex items-center gap-3 p-3 rounded-2xl bg-[#FAF8F5] text-sm font-semibold text-[#00332A]"
+            >
+              <Printer className="w-4 h-4 text-[#0E5B44]" />
+              <span>Print &amp; Kartu Ucapan</span>
             </Link>
             <a
               href={storefrontUrl}

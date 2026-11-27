@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 import {
   TrendingUp,
   Wallet,
@@ -10,6 +11,7 @@ import {
   ArrowRight,
   Package,
   RefreshCw,
+  Printer,
 } from "lucide-react";
 import { formatRupiah } from "@/lib/format";
 import { QuickChatPanel } from "@/components/admin/QuickChatPanel";
@@ -151,7 +153,14 @@ export default function AdminDashboardPage() {
             Pantau Laba Bersih, BEP, ROE, Pipeline Pesanan &amp; Stok Real-Time.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href="/print"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0E5B44] hover:bg-[#0B4A37] text-xs font-mono font-bold text-[#F4F1E8] shadow-sm transition-colors"
+          >
+            <Printer className="w-3.5 h-3.5 text-[#C4DE6E]" />
+            <span>Print &amp; Ucapan</span>
+          </Link>
           <span
             className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-mono font-bold border ${
               data.storageEngine === "MYSQL"

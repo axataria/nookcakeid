@@ -30,32 +30,14 @@ export default function ProcurementPage() {
     freightCost
   );
 
-  const purchaseOrders = [
-    {
-      id: 'PO-202611-04',
-      supplier: 'CV Prima Dairy (Keju Calf & Anchor)',
-      orderDate: '22 Nov 2026',
-      totalAmount: 950000,
-      status: 'FULLY_RECEIVED',
-      items: '5kg Keju Calf, 3kg Anchor Cream',
-    },
-    {
-      id: 'PO-202611-05',
-      supplier: 'EcoPack Indonesia (Bagasse Bento Box)',
-      orderDate: '23 Nov 2026',
-      totalAmount: 264000,
-      status: 'SUBMITTED',
-      items: '100 pcs Bagasse Box 10x7, 100 Sendok Kayu',
-    },
-    {
-      id: 'PO-202611-06',
-      supplier: 'Kyoto Tea Co. (Uji Matcha Powder)',
-      orderDate: '23 Nov 2026',
-      totalAmount: 380000,
-      status: 'DRAFT',
-      items: '500g Ceremonial Grade Uji Matcha',
-    },
-  ];
+  const purchaseOrders: {
+    id: string;
+    supplier: string;
+    orderDate: string;
+    totalAmount: number;
+    status: string;
+    items: string;
+  }[] = [];
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -176,42 +158,48 @@ export default function ProcurementPage() {
         </div>
 
         <div className="space-y-3">
-          {purchaseOrders.map((po) => (
-            <div
-              key={po.id}
-              className="p-5 rounded-2xl bg-[#FAF8F5] border border-[#E8E1D5] flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-            >
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold text-xs text-[#1C1917]">
-                    {po.id}
-                  </span>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                      po.status === 'FULLY_RECEIVED'
-                        ? 'bg-[#DCFCE7] text-[#15803D]'
-                        : po.status === 'SUBMITTED'
-                        ? 'bg-[#FEF3C7] text-[#B45309]'
-                        : 'bg-[#F3EFEA] text-[#78716C]'
-                    }`}
-                  >
-                    {po.status}
-                  </span>
-                </div>
-                <h3 className="font-serif text-sm font-bold text-[#1C1917]">
-                  {po.supplier}
-                </h3>
-                <p className="text-xs text-[#78716C]">{po.items}</p>
-              </div>
-
-              <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center">
-                <span className="font-serif font-bold text-sm text-[#1C1917]">
-                  {formatRupiah(po.totalAmount)}
-                </span>
-                <span className="text-[10px] text-[#78716C]">{po.orderDate}</span>
-              </div>
+          {purchaseOrders.length === 0 ? (
+            <div className="p-8 rounded-2xl bg-[#FAF8F5] border border-dashed border-[#E8E1D5] text-center text-xs text-[#78716C]">
+              Belum ada Purchase Order.
             </div>
-          ))}
+          ) : (
+            purchaseOrders.map((po) => (
+              <div
+                key={po.id}
+                className="p-5 rounded-2xl bg-[#FAF8F5] border border-[#E8E1D5] flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-bold text-xs text-[#1C1917]">
+                      {po.id}
+                    </span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                        po.status === 'FULLY_RECEIVED'
+                          ? 'bg-[#DCFCE7] text-[#15803D]'
+                          : po.status === 'SUBMITTED'
+                          ? 'bg-[#FEF3C7] text-[#B45309]'
+                          : 'bg-[#F3EFEA] text-[#78716C]'
+                      }`}
+                    >
+                      {po.status}
+                    </span>
+                  </div>
+                  <h3 className="font-serif text-sm font-bold text-[#1C1917]">
+                    {po.supplier}
+                  </h3>
+                  <p className="text-xs text-[#78716C]">{po.items}</p>
+                </div>
+
+                <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center">
+                  <span className="font-serif font-bold text-sm text-[#1C1917]">
+                    {formatRupiah(po.totalAmount)}
+                  </span>
+                  <span className="text-[10px] text-[#78716C]">{po.orderDate}</span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
