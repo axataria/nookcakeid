@@ -3,7 +3,9 @@ import {
   addEquityRecord,
   addOpexRecord,
   createQuickOrder,
+  getFullStoreState,
   recordMaterialRestock,
+  updateOrderStatus,
 } from "@/lib/admin-store";
 import type { ParsedAction } from "@/lib/smart-parser";
 
@@ -37,10 +39,59 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, type: "RESTOCK", data: result });
     }
 
+    if (action.type === "RESTOCK_BATCH") {
+      const results = [];
+      for (const item of action.items) {
+        const res = await recordMaterialRestock({
+          materialId: item.materialId,
+          materialName: item.materialName,
+          baseUnit: item.baseUnit,
+          quantityAdded: item.quantityAdded,
+          totalPrice: item.totalPrice,
+          notes: `${item.packSize}${item.baseUnit === "PIECE" ? "pcs" : item.baseUnit.toLowerCase()} × ${item.packCount} (Batch)`,
+        });
+        results.push(res);
+      }
+      return NextResponse.json({ ok: true, type: "RESTOCK_BATCH", data: results });
+    }
+
+    if (action.type === "ORDER_STATUS") {
+      const state = await getFullStoreState();
+      const needle = action.target.toLowerCase().replace(/^#/, "");
+      const matches = state.orders.filter(
+        (o) =>
+          o.orderNumber.toLowerCase().includes(needle) ||
+          o.customerName.toLowerCase().includes(needle),
+      );
+      const matched =
+        matches.find((o) => o.status !== "DELIVERED" && o.status !== "CANCELLED") ||
+        matches[0];
+      if (!matched) {
+        return NextResponse.json(
+          { error: `Pesanan "${action.target}" tidak ditemukan.` },
+          { status: 404 },
+        );
+      }
+      const updated = await updateOrderStatus(matched.id, action.nextStatus);
+      return NextResponse.json({ ok: true, type: "ORDER_STATUS", data: updated });
+    }
+
     if (action.type === "OPEX") {
+      const lowerName = action.name.toLowerCase();
+      const category = /listrik|air|gas|wifi|internet|kuota/.test(lowerName)
+        ? "UTILITIES"
+        : /iklan|ads|promo|endorse|ig|tiktok/.test(lowerName)
+        ? "MARKETING"
+        : /sewa|kontrak|tempat/.test(lowerName)
+        ? "RENT"
+        : /gaji|karyawan|helper|upah/.test(lowerName)
+        ? "LABOR"
+        : /box|kemasan|sendok|plastik|pack/.test(lowerName)
+        ? "PACKAGING_MISC"
+        : "OTHER";
       const opex = await addOpexRecord({
         name: action.name,
-        category: "OTHER",
+        category,
         amount: action.amount,
         notes: "Dicatat via Admin Quick Chat",
       });

@@ -19,8 +19,12 @@ interface QuerySnapshot {
   kpis: {
     totalRevenue: number;
     grossProfit: number;
+    grossMarginPct: number;
     netProfit: number;
     roePct: number;
+    totalUnitsSold: number;
+    bepTargetUnits: number;
+    bepProgressPct: number;
     todayBookedUnits: number;
     dailySlotCapacity: number;
   };
@@ -39,6 +43,21 @@ interface QuerySnapshot {
     totalAmount: number;
     status: string;
   }[];
+  prepSummary?: {
+    ovenBatches: {
+      totalBento: number;
+      totalSlice: number;
+      totalWhole: number;
+      loyangBesarEquivalent: number;
+      recommendedOvenBatches: number;
+    };
+    mrpRequirements: {
+      materialCode: string;
+      name: string;
+      totalQuantity: number;
+      unit: string;
+    }[];
+  };
 }
 
 interface ChatMessage {
@@ -52,9 +71,11 @@ interface ChatMessage {
 
 const SHORTCUTS = [
   { label: "+ Order", template: "order Budi 2 bento 1 matcha besok" },
-  { label: "+ Stok", template: "masuk calf 200g 2pcs 48000" },
+  { label: "+ Stok", template: "masuk calf 200g 24rb, fibercreme 100g 16rb" },
   { label: "+ OPEX", template: "opex listrik 350rb" },
   { label: "Cek Laba", template: "cek laba", autoSend: true },
+  { label: "Cek BEP", template: "cek bep", autoSend: true },
+  { label: "Cek Prep", template: "cek prep", autoSend: true },
   { label: "Cek Stok", template: "cek stok", autoSend: true },
   { label: "Rekap Besok", template: "rekap besok", autoSend: true },
 ];
@@ -67,6 +88,8 @@ export function QuickChatPanel({
   compact?: boolean;
 }) {
   const [input, setInput] = useState("");
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyIdx, setHistoryIdx] = useState(-1);
   const [loading, setLoading] = useState(false);
   const [executingId, setExecutingId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -92,6 +115,8 @@ export function QuickChatPanel({
       text: clean,
     };
     setMessages((prev) => [...prev, ownerMsg]);
+    setHistory((prev) => (prev[0] === clean ? prev : [clean, ...prev].slice(0, 30)));
+    setHistoryIdx(-1);
     setInput("");
     setLoading(true);
 
@@ -363,6 +388,56 @@ export function QuickChatPanel({
                         </div>
                       )}
 
+                      {msg.parsed.type === "RESTOCK_BATCH" && (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0E5B44]">
+                              <PackagePlus className="w-3.5 h-3.5" />
+                              Tambah {msg.parsed.items.length} Stok Bahan (Batch)
+                            </span>
+                          </div>
+                          <div className="text-xs font-mono bg-[#FAF7F2] p-2.5 rounded-xl border border-[#E8E1D5] space-y-1.5">
+                            {msg.parsed.items.map((it, idx) => (
+                              <div
+                                key={idx}
+                                className="flex justify-between text-[#2E4732]"
+                              >
+                                <span>
+                                  {it.materialName} (+{it.quantityAdded.toLocaleString("id-ID")}{" "}
+                                  {it.baseUnit === "PIECE"
+                                    ? "pcs"
+                                    : it.baseUnit.toLowerCase()}
+                                  )
+                                </span>
+                                <span className="font-bold text-[#00332A]">
+                                  {it.totalPrice > 0
+                                    ? formatRupiah(it.totalPrice)
+                                    : "-"}
+                                </span>
+                              </div>
+                            ))}
+                            {msg.parsed.totalPrice > 0 && (
+                              <div className="pt-1 border-t border-[#D9D3C5] flex justify-between font-bold text-[#00332A]">
+                                <span>Total Belanja</span>
+                                <span>{formatRupiah(msg.parsed.totalPrice)}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {msg.parsed.type === "ORDER_STATUS" && (
+                        <div className="space-y-1.5 text-xs font-mono bg-[#FAF7F2] p-2.5 rounded-xl border border-[#E8E1D5]">
+                          <div className="font-bold text-[#0E5B44]">
+                            Update Status Pesanan
+                          </div>
+                          <div className="flex justify-between text-[#00332A]">
+                            <span>Target: {msg.parsed.target}</span>
+                            <strong>→ {msg.parsed.statusLabel}</strong>
+                          </div>
+                        </div>
+                      )}
+
                       {(msg.parsed.type === "OPEX" ||
                         msg.parsed.type === "EQUITY") && (
                         <div className="space-y-1.5 text-xs font-mono bg-[#FAF7F2] p-2.5 rounded-xl border border-[#E8E1D5]">
@@ -474,6 +549,82 @@ export function QuickChatPanel({
                       </>
                     )}
 
+                    {msg.parsed.queryKind === "BEP" && (
+                      <>
+                        <div className="flex items-center gap-1.5 font-bold text-[#0E5B44]">
+                          <TrendingUp className="w-3.5 h-3.5" />
+                          Status BEP &amp; Margin
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Terjual Bulan Ini:</span>
+                          <strong>
+                            {msg.queryResult.kpis.totalUnitsSold} / {msg.queryResult.kpis.bepTargetUnits} loyang
+                          </strong>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Progress BEP:</span>
+                          <strong className="text-[#0E5B44]">
+                            {msg.queryResult.kpis.bepProgressPct}%
+                          </strong>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Sisa Target BEP:</span>
+                          <strong>
+                            {Math.max(
+                              0,
+                              msg.queryResult.kpis.bepTargetUnits -
+                                msg.queryResult.kpis.totalUnitsSold,
+                            )}{" "}
+                            loyang
+                          </strong>
+                        </div>
+                        <div className="flex justify-between border-t border-[#E8E1D5] pt-1">
+                          <span>Gross Margin Rata-rata:</span>
+                          <strong className="text-[#0E5B44]">
+                            {msg.queryResult.kpis.grossMarginPct}%
+                          </strong>
+                        </div>
+                      </>
+                    )}
+
+                    {msg.parsed.queryKind === "PREP" && msg.queryResult.prepSummary && (
+                      <>
+                        <div className="font-bold text-[#0E5B44]">
+                          Prep Dapur &amp; Kebutuhan Oven
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Bento / Whole / Slice:</span>
+                          <strong>
+                            {msg.queryResult.prepSummary.ovenBatches.totalBento} /{" "}
+                            {msg.queryResult.prepSummary.ovenBatches.totalWhole} /{" "}
+                            {msg.queryResult.prepSummary.ovenBatches.totalSlice}
+                          </strong>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Batch Oven (max 4 loyang):</span>
+                          <strong className="text-[#0E5B44]">
+                            {msg.queryResult.prepSummary.ovenBatches.recommendedOvenBatches} batch
+                          </strong>
+                        </div>
+                        {msg.queryResult.prepSummary.mrpRequirements.length > 0 && (
+                          <div className="pt-1 border-t border-[#E8E1D5] space-y-1">
+                            <div className="text-[11px] text-[#78716C]">
+                              Kebutuhan Bahan Utama:
+                            </div>
+                            {msg.queryResult.prepSummary.mrpRequirements.map((r) => (
+                              <div key={r.materialCode} className="flex justify-between">
+                                <span>{r.name}</span>
+                                <strong>
+                                  {r.totalQuantity.toLocaleString("id-ID")}{" "}
+                                  {r.unit.toLowerCase()}
+                                </strong>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+
                     {msg.parsed.queryKind === "TOMORROW" && (
                       <>
                         <div className="font-bold text-[#00332A]">
@@ -510,6 +661,24 @@ export function QuickChatPanel({
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowUp" && history.length > 0) {
+              e.preventDefault();
+              const nextIdx = Math.min(historyIdx + 1, history.length - 1);
+              setHistoryIdx(nextIdx);
+              setInput(history[nextIdx]);
+            } else if (e.key === "ArrowDown") {
+              e.preventDefault();
+              const nextIdx = historyIdx - 1;
+              if (nextIdx < 0) {
+                setHistoryIdx(-1);
+                setInput("");
+              } else {
+                setHistoryIdx(nextIdx);
+                setInput(history[nextIdx]);
+              }
+            }
+          }}
           placeholder="Ketik: order Budi 2 bento 1 matcha besok..."
           className="flex-1 px-3.5 py-2.5 rounded-xl bg-[#FAF7F2] border border-[#D9D3C5] text-xs sm:text-sm font-mono text-[#00332A] placeholder:text-[#687E6C]/70 focus:outline-none focus:border-[#0E5B44]"
         />

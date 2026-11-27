@@ -5,6 +5,17 @@ export interface CorrectionNote {
   correctedTo: string;
 }
 
+export interface RestockItem {
+  materialId?: string;
+  materialName: string;
+  baseUnit: "GRAM" | "PIECE" | "ML";
+  packSize: number;
+  packCount: number;
+  quantityAdded: number;
+  totalPrice: number;
+  unitCost: number;
+}
+
 export type ParsedAction =
   | {
       type: "ORDER";
@@ -20,16 +31,21 @@ export type ParsedAction =
       totalAmount: number;
       corrections: CorrectionNote[];
     }
-  | {
+  | ({
       type: "RESTOCK";
-      materialId?: string;
-      materialName: string;
-      baseUnit: "GRAM" | "PIECE" | "ML";
-      packSize: number;
-      packCount: number;
-      quantityAdded: number;
+      corrections: CorrectionNote[];
+    } & RestockItem)
+  | {
+      type: "RESTOCK_BATCH";
+      items: RestockItem[];
       totalPrice: number;
-      unitCost: number;
+      corrections: CorrectionNote[];
+    }
+  | {
+      type: "ORDER_STATUS";
+      target: string;
+      nextStatus: "CONFIRMED_SLOT" | "BAKING" | "READY_FOR_DELIVERY" | "DELIVERED" | "CANCELLED";
+      statusLabel: string;
       corrections: CorrectionNote[];
     }
   | {
@@ -46,7 +62,7 @@ export type ParsedAction =
     }
   | {
       type: "QUERY";
-      queryKind: "STOCK" | "PROFIT" | "TOMORROW";
+      queryKind: "STOCK" | "PROFIT" | "TOMORROW" | "BEP" | "PREP";
       corrections: CorrectionNote[];
     }
   | {
@@ -98,23 +114,30 @@ const PRODUCT_KEYWORDS: {
   productName: string;
   unitPrice: number;
 }[] = [
-  { keyword: "whole", sku: "CAKE-WHOLE-18CM", productName: "The Whole Basque", unitPrice: 195000 },
-  { keyword: "utuh", sku: "CAKE-WHOLE-18CM", productName: "The Whole Basque", unitPrice: 195000 },
-  { keyword: "loyang", sku: "CAKE-WHOLE-18CM", productName: "The Whole Basque", unitPrice: 195000 },
-  { keyword: "bento", sku: "CAKE-BURNT-CORNER-10CM", productName: "The Burnt Corner", unitPrice: 35000 },
-  { keyword: "burnt", sku: "CAKE-BURNT-CORNER-10CM", productName: "The Burnt Corner", unitPrice: 35000 },
-  { keyword: "corner", sku: "CAKE-BURNT-CORNER-10CM", productName: "The Burnt Corner", unitPrice: 35000 },
-  { keyword: "ori", sku: "CAKE-BURNT-CORNER-10CM", productName: "The Burnt Corner", unitPrice: 35000 },
-  { keyword: "original", sku: "CAKE-BURNT-CORNER-10CM", productName: "The Burnt Corner", unitPrice: 35000 },
-  { keyword: "matcha", sku: "CAKE-MATCHA-BASQUE-10CM", productName: "The Matcha Basque", unitPrice: 40000 },
-  { keyword: "greentea", sku: "CAKE-MATCHA-BASQUE-10CM", productName: "The Matcha Basque", unitPrice: 40000 },
-  { keyword: "choco", sku: "CAKE-CHOCO-BASQUE-10CM", productName: "The Choco Basque", unitPrice: 40000 },
-  { keyword: "coklat", sku: "CAKE-CHOCO-BASQUE-10CM", productName: "The Choco Basque", unitPrice: 40000 },
-  { keyword: "cokelat", sku: "CAKE-CHOCO-BASQUE-10CM", productName: "The Choco Basque", unitPrice: 40000 },
-  { keyword: "ganache", sku: "SAUCE-CHOCOLATE-25ML", productName: "Chocolate Ganache (25ml)", unitPrice: 10000 },
-  { keyword: "strawberry", sku: "SAUCE-STRAWBERRY-25ML", productName: "Selai Strawberry (25ml)", unitPrice: 10000 },
-  { keyword: "stroberi", sku: "SAUCE-STRAWBERRY-25ML", productName: "Selai Strawberry (25ml)", unitPrice: 10000 },
-  { keyword: "selai", sku: "SAUCE-STRAWBERRY-25ML", productName: "Selai Strawberry (25ml)", unitPrice: 10000 },
+  { keyword: "whole", sku: "CAKE-WHOLE-18CM", productName: "The Whole Basque", unitPrice: FINANCIAL_MASTER["CAKE-WHOLE-18CM"].sellingPrice },
+  { keyword: "utuh", sku: "CAKE-WHOLE-18CM", productName: "The Whole Basque", unitPrice: FINANCIAL_MASTER["CAKE-WHOLE-18CM"].sellingPrice },
+  { keyword: "loyang", sku: "CAKE-WHOLE-18CM", productName: "The Whole Basque", unitPrice: FINANCIAL_MASTER["CAKE-WHOLE-18CM"].sellingPrice },
+  { keyword: "18cm", sku: "CAKE-WHOLE-18CM", productName: "The Whole Basque", unitPrice: FINANCIAL_MASTER["CAKE-WHOLE-18CM"].sellingPrice },
+  { keyword: "bento", sku: "CAKE-BURNT-CORNER-10CM", productName: "The Burnt Corner", unitPrice: FINANCIAL_MASTER["CAKE-BURNT-CORNER-10CM"].sellingPrice },
+  { keyword: "burnt", sku: "CAKE-BURNT-CORNER-10CM", productName: "The Burnt Corner", unitPrice: FINANCIAL_MASTER["CAKE-BURNT-CORNER-10CM"].sellingPrice },
+  { keyword: "corner", sku: "CAKE-BURNT-CORNER-10CM", productName: "The Burnt Corner", unitPrice: FINANCIAL_MASTER["CAKE-BURNT-CORNER-10CM"].sellingPrice },
+  { keyword: "ori", sku: "CAKE-BURNT-CORNER-10CM", productName: "The Burnt Corner", unitPrice: FINANCIAL_MASTER["CAKE-BURNT-CORNER-10CM"].sellingPrice },
+  { keyword: "original", sku: "CAKE-BURNT-CORNER-10CM", productName: "The Burnt Corner", unitPrice: FINANCIAL_MASTER["CAKE-BURNT-CORNER-10CM"].sellingPrice },
+  { keyword: "cheesecake", sku: "CAKE-BURNT-CORNER-10CM", productName: "The Burnt Corner", unitPrice: FINANCIAL_MASTER["CAKE-BURNT-CORNER-10CM"].sellingPrice },
+  { keyword: "ciskek", sku: "CAKE-BURNT-CORNER-10CM", productName: "The Burnt Corner", unitPrice: FINANCIAL_MASTER["CAKE-BURNT-CORNER-10CM"].sellingPrice },
+  { keyword: "10cm", sku: "CAKE-BURNT-CORNER-10CM", productName: "The Burnt Corner", unitPrice: FINANCIAL_MASTER["CAKE-BURNT-CORNER-10CM"].sellingPrice },
+  { keyword: "matcha", sku: "CAKE-MATCHA-BASQUE-10CM", productName: "The Matcha Basque", unitPrice: FINANCIAL_MASTER["CAKE-MATCHA-BASQUE-10CM"].sellingPrice },
+  { keyword: "greentea", sku: "CAKE-MATCHA-BASQUE-10CM", productName: "The Matcha Basque", unitPrice: FINANCIAL_MASTER["CAKE-MATCHA-BASQUE-10CM"].sellingPrice },
+  { keyword: "zenlatte", sku: "CAKE-MATCHA-BASQUE-10CM", productName: "The Matcha Basque", unitPrice: FINANCIAL_MASTER["CAKE-MATCHA-BASQUE-10CM"].sellingPrice },
+  { keyword: "choco", sku: "CAKE-CHOCO-BASQUE-10CM", productName: "The Choco Basque", unitPrice: FINANCIAL_MASTER["CAKE-CHOCO-BASQUE-10CM"].sellingPrice },
+  { keyword: "coklat", sku: "CAKE-CHOCO-BASQUE-10CM", productName: "The Choco Basque", unitPrice: FINANCIAL_MASTER["CAKE-CHOCO-BASQUE-10CM"].sellingPrice },
+  { keyword: "cokelat", sku: "CAKE-CHOCO-BASQUE-10CM", productName: "The Choco Basque", unitPrice: FINANCIAL_MASTER["CAKE-CHOCO-BASQUE-10CM"].sellingPrice },
+  { keyword: "chocolatos", sku: "CAKE-CHOCO-BASQUE-10CM", productName: "The Choco Basque", unitPrice: FINANCIAL_MASTER["CAKE-CHOCO-BASQUE-10CM"].sellingPrice },
+  { keyword: "ganache", sku: "SAUCE-CHOCOLATE-25ML", productName: "Chocolate Ganache (25ml)", unitPrice: FINANCIAL_MASTER["SAUCE-CHOCOLATE-25ML"].sellingPrice },
+  { keyword: "strawberry", sku: "SAUCE-STRAWBERRY-25ML", productName: "Selai Strawberry (25ml)", unitPrice: FINANCIAL_MASTER["SAUCE-STRAWBERRY-25ML"].sellingPrice },
+  { keyword: "stroberi", sku: "SAUCE-STRAWBERRY-25ML", productName: "Selai Strawberry (25ml)", unitPrice: FINANCIAL_MASTER["SAUCE-STRAWBERRY-25ML"].sellingPrice },
+  { keyword: "selai", sku: "SAUCE-STRAWBERRY-25ML", productName: "Selai Strawberry (25ml)", unitPrice: FINANCIAL_MASTER["SAUCE-STRAWBERRY-25ML"].sellingPrice },
+  { keyword: "saus", sku: "SAUCE-CHOCOLATE-25ML", productName: "Chocolate Ganache (25ml)", unitPrice: FINANCIAL_MASTER["SAUCE-CHOCOLATE-25ML"].sellingPrice },
 ];
 
 const MATERIAL_KEYWORDS: {
@@ -126,17 +149,31 @@ const MATERIAL_KEYWORDS: {
   { keyword: "calf", materialId: "mat-calf", materialName: "Cream Cheese Calf", baseUnit: "GRAM" },
   { keyword: "keju", materialId: "mat-calf", materialName: "Cream Cheese Calf", baseUnit: "GRAM" },
   { keyword: "cheese", materialId: "mat-calf", materialName: "Cream Cheese Calf", baseUnit: "GRAM" },
-  { keyword: "anchor", materialId: "mat-anchor-cream", materialName: "Whipped Cream Anchor", baseUnit: "ML" },
-  { keyword: "cream", materialId: "mat-anchor-cream", materialName: "Whipped Cream Anchor", baseUnit: "ML" },
-  { keyword: "telur", materialId: "mat-telur", materialName: "Telur Omega-3", baseUnit: "GRAM" },
-  { keyword: "egg", materialId: "mat-telur", materialName: "Telur Omega-3", baseUnit: "GRAM" },
-  { keyword: "matcha", materialId: "mat-matcha", materialName: "Uji Matcha Powder", baseUnit: "GRAM" },
-  { keyword: "coklat", materialId: "mat-choco", materialName: "Dark Chocolate 70%", baseUnit: "GRAM" },
-  { keyword: "choco", materialId: "mat-choco", materialName: "Dark Chocolate 70%", baseUnit: "GRAM" },
-  { keyword: "strawberry", materialId: "mat-strawberry", materialName: "Selai Strawberry Compote", baseUnit: "ML" },
-  { keyword: "stroberi", materialId: "mat-strawberry", materialName: "Selai Strawberry Compote", baseUnit: "ML" },
-  { keyword: "bento", materialId: "mat-box-bento", materialName: "Box Bagasse Bento 10cm", baseUnit: "PIECE" },
-  { keyword: "box", materialId: "mat-box-bento", materialName: "Box Bagasse Bento 10cm", baseUnit: "PIECE" },
+  { keyword: "fibercreme", materialId: "mat-fibercreme", materialName: "FiberCreme Bubuk", baseUnit: "GRAM" },
+  { keyword: "fiber", materialId: "mat-fibercreme", materialName: "FiberCreme Bubuk", baseUnit: "GRAM" },
+  { keyword: "whipcream", materialId: "mat-fibercreme", materialName: "FiberCreme Bubuk", baseUnit: "GRAM" },
+  { keyword: "telur", materialId: "mat-telur", materialName: "Telur Ayam Segar", baseUnit: "PIECE" },
+  { keyword: "telor", materialId: "mat-telur", materialName: "Telur Ayam Segar", baseUnit: "PIECE" },
+  { keyword: "egg", materialId: "mat-telur", materialName: "Telur Ayam Segar", baseUnit: "PIECE" },
+  { keyword: "pondan", materialId: "mat-pondan", materialName: "Pondan Signature Brownie Mix", baseUnit: "PIECE" },
+  { keyword: "brownies", materialId: "mat-pondan", materialName: "Pondan Signature Brownie Mix", baseUnit: "PIECE" },
+  { keyword: "brownie", materialId: "mat-pondan", materialName: "Pondan Signature Brownie Mix", baseUnit: "PIECE" },
+  { keyword: "gula", materialId: "mat-gula", materialName: "Gula Pasir", baseUnit: "GRAM" },
+  { keyword: "maizena", materialId: "mat-maizena", materialName: "Tepung Maizena Hawaii", baseUnit: "GRAM" },
+  { keyword: "hawaii", materialId: "mat-maizena", materialName: "Tepung Maizena Hawaii", baseUnit: "GRAM" },
+  { keyword: "vanilla", materialId: "mat-vanilla", materialName: "Vanilla Bubuk Koepoe", baseUnit: "GRAM" },
+  { keyword: "vanili", materialId: "mat-vanilla", materialName: "Vanilla Bubuk Koepoe", baseUnit: "GRAM" },
+  { keyword: "koepoe", materialId: "mat-vanilla", materialName: "Vanilla Bubuk Koepoe", baseUnit: "GRAM" },
+  { keyword: "garam", materialId: "mat-garam", materialName: "Garam Dapur", baseUnit: "GRAM" },
+  { keyword: "matcha", materialId: "mat-matcha", materialName: "Zenlatte Matcha (Sachet)", baseUnit: "PIECE" },
+  { keyword: "zenlatte", materialId: "mat-matcha", materialName: "Zenlatte Matcha (Sachet)", baseUnit: "PIECE" },
+  { keyword: "chocolatos", materialId: "mat-chocolatos", materialName: "Chocolatos Drink (Sachet)", baseUnit: "PIECE" },
+  { keyword: "coklat", materialId: "mat-chocolatos", materialName: "Chocolatos Drink (Sachet)", baseUnit: "PIECE" },
+  { keyword: "choco", materialId: "mat-chocolatos", materialName: "Chocolatos Drink (Sachet)", baseUnit: "PIECE" },
+  { keyword: "bento", materialId: "mat-box-bento", materialName: "Packaging Box Bento", baseUnit: "PIECE" },
+  { keyword: "box", materialId: "mat-box-bento", materialName: "Packaging Box Bento", baseUnit: "PIECE" },
+  { keyword: "pack", materialId: "mat-box-bento", materialName: "Packaging Box Bento", baseUnit: "PIECE" },
+  { keyword: "sendok", materialId: "mat-sendok", materialName: "Sendok Kayu", baseUnit: "PIECE" },
   { keyword: "whole", materialId: "mat-box-whole", materialName: "Box Whole Cake 18cm + Pita", baseUnit: "PIECE" },
 ];
 
@@ -179,9 +216,15 @@ export function parseQuickChatCommand(rawInput: string): ParsedAction {
   const firstWord = tokens[0].toLowerCase();
   const corrections: CorrectionNote[] = [];
 
-  // 1. Query shortcuts: cek stok, cek laba, rekap besok
+  // 1. Query shortcuts: cek stok, cek laba, cek bep, cek prep/oven, rekap besok
   if (firstWord === "cek" || firstWord === "rekap" || firstWord === "status") {
-    if (lower.includes("stok") || lower.includes("bahan")) {
+    if (lower.includes("oven") || lower.includes("prep") || lower.includes("panggang") || lower.includes("bahan")) {
+      return { type: "QUERY", queryKind: "PREP", corrections };
+    }
+    if (lower.includes("bep") || lower.includes("impas") || lower.includes("margin") || lower.includes("target")) {
+      return { type: "QUERY", queryKind: "BEP", corrections };
+    }
+    if (lower.includes("stok")) {
       return { type: "QUERY", queryKind: "STOCK", corrections };
     }
     if (lower.includes("laba") || lower.includes("profit") || lower.includes("roe") || lower.includes("uang")) {
@@ -189,6 +232,35 @@ export function parseQuickChatCommand(rawInput: string): ParsedAction {
     }
     if (lower.includes("besok") || lower.includes("order") || lower.includes("rekap")) {
       return { type: "QUERY", queryKind: "TOMORROW", corrections };
+    }
+  }
+
+  // 1b. Order status update: "oven Budi", "siap #ORD-001", "selesai Budi", "konfirmasi Budi", "batal Budi"
+  const STATUS_COMMANDS: Record<
+    string,
+    { status: "CONFIRMED_SLOT" | "BAKING" | "READY_FOR_DELIVERY" | "DELIVERED" | "CANCELLED"; label: string }
+  > = {
+    konfirmasi: { status: "CONFIRMED_SLOT", label: "Slot Terkonfirmasi" },
+    confirm: { status: "CONFIRMED_SLOT", label: "Slot Terkonfirmasi" },
+    oven: { status: "BAKING", label: "Di Oven" },
+    panggang: { status: "BAKING", label: "Di Oven" },
+    bake: { status: "BAKING", label: "Di Oven" },
+    siap: { status: "READY_FOR_DELIVERY", label: "Siap Kirim" },
+    kirim: { status: "READY_FOR_DELIVERY", label: "Siap Kirim" },
+    selesai: { status: "DELIVERED", label: "Selesai" },
+    lunas: { status: "DELIVERED", label: "Selesai" },
+    batal: { status: "CANCELLED", label: "Dibatalkan" },
+  };
+  if (STATUS_COMMANDS[firstWord] && tokens.length >= 2) {
+    const target = tokens.slice(1).join(" ").trim();
+    if (target) {
+      return {
+        type: "ORDER_STATUS",
+        target,
+        nextStatus: STATUS_COMMANDS[firstWord].status,
+        statusLabel: STATUS_COMMANDS[firstWord].label,
+        corrections,
+      };
     }
   }
 
@@ -215,7 +287,97 @@ export function parseQuickChatCommand(rawInput: string): ParsedAction {
     }
   }
 
-  // 3. Restock / Goods Receipt command: "masuk calf 200g 2pcs 48000"
+function parseRestockSegment(
+  segmentTokens: string[],
+  corrections: CorrectionNote[],
+): RestockItem | null {
+  let matchedMat: (typeof MATERIAL_KEYWORDS)[number] | null = null;
+  let packSize = 0;
+  let packCount = 1;
+  let totalPrice = 0;
+  let fallbackUnit: "GRAM" | "PIECE" | "ML" = "GRAM";
+  const unknownWords: string[] = [];
+
+  for (const tok of segmentTokens) {
+    const tokLower = tok.toLowerCase();
+
+    // Weight / volume token: 200g, 1.5kg, 500ml, 2l
+    const weightMatch = tokLower.match(/^(\d+(?:\.\d+)?)(kg|g|gr|gram|ml|l|liter)$/);
+    if (weightMatch) {
+      const val = parseFloat(weightMatch[1]);
+      const unit = weightMatch[2];
+      if (unit === "kg" || unit === "l" || unit === "liter") {
+        packSize = Math.round(val * 1000);
+        fallbackUnit = unit === "kg" ? "GRAM" : "ML";
+      } else {
+        packSize = Math.round(val);
+        fallbackUnit = unit === "ml" ? "ML" : "GRAM";
+      }
+      continue;
+    }
+
+    // Pack count token: 2pcs, 3x, 5box, 10biji
+    const pcsMatch = tokLower.match(/^(\d+)(pcs|pc|x|pack|bks|box|bh|buah|dus)$/);
+    if (pcsMatch) {
+      packCount = parseInt(pcsMatch[1], 10);
+      continue;
+    }
+
+    // Price token: 48000, 120rb, 48k
+    const priceVal = parseShorthandPrice(tok);
+    if (priceVal !== null) {
+      totalPrice = priceVal;
+      continue;
+    }
+
+    // Plain small number could be packCount if packSize is already known
+    if (/^\d{1,3}$/.test(tokLower)) {
+      const n = parseInt(tokLower, 10);
+      if (packSize > 0) packCount = n;
+      else packSize = n;
+      continue;
+    }
+
+    // Material fuzzy match
+    const found = fuzzyFind(tokLower, MATERIAL_KEYWORDS);
+    if (found) {
+      matchedMat = found.match;
+      if (found.wasCorrected) {
+        corrections.push({ original: tok, correctedTo: found.match.materialName });
+      }
+    } else {
+      unknownWords.push(tok);
+    }
+  }
+
+  const materialName =
+    matchedMat?.materialName ||
+    (unknownWords.length ? unknownWords.join(" ") : "Bahan Baku");
+  const baseUnit = matchedMat?.baseUnit || fallbackUnit;
+
+  const effectivePackSize = packSize > 0 ? packSize : 1;
+  const quantityAdded = effectivePackSize * packCount;
+  const unitCost =
+    totalPrice > 0 && quantityAdded > 0
+      ? Math.round((totalPrice / quantityAdded) * 100) / 100
+      : 0;
+
+  if (quantityAdded > 0 && (matchedMat || unknownWords.length > 0)) {
+    return {
+      materialId: matchedMat?.materialId,
+      materialName,
+      baseUnit,
+      packSize: effectivePackSize,
+      packCount,
+      quantityAdded,
+      totalPrice,
+      unitCost,
+    };
+  }
+  return null;
+}
+
+  // 3. Restock / Goods Receipt command: "masuk calf 200g 2pcs 48000" or multi-item "masuk calf 200g 24rb, fibercreme 100g 16rb"
   const isRestock =
     ["masuk", "restock", "stok", "beli", "tambah"].includes(firstWord) ||
     levenshtein(firstWord, "masuk") <= 1 ||
@@ -226,94 +388,129 @@ export function parseQuickChatCommand(rawInput: string): ParsedAction {
       corrections.push({ original: tokens[0], correctedTo: "masuk" });
     }
 
-    let matchedMat: (typeof MATERIAL_KEYWORDS)[number] | null = null;
-    let packSize = 0;
-    let packCount = 1;
-    let totalPrice = 0;
-    let fallbackUnit: "GRAM" | "PIECE" | "ML" = "GRAM";
-    const unknownWords: string[] = [];
+    const restText = trimmed.slice(tokens[0].length).trim();
+    const segments = restText
+      .split(",")
+      .map((s) => s.trim().split(/\s+/).filter(Boolean))
+      .filter((segs) => segs.length > 0);
 
-    for (let i = 1; i < tokens.length; i++) {
-      const tok = tokens[i];
-      const tokLower = tok.toLowerCase();
+    const parsedItems = segments
+      .map((segTokens) => parseRestockSegment(segTokens, corrections))
+      .filter((it): it is RestockItem => it !== null);
 
-      // Weight / volume token: 200g, 1.5kg, 500ml, 2l
-      const weightMatch = tokLower.match(/^(\d+(?:\.\d+)?)(kg|g|gr|gram|ml|l|liter)$/);
-      if (weightMatch) {
-        const val = parseFloat(weightMatch[1]);
-        const unit = weightMatch[2];
-        if (unit === "kg" || unit === "l" || unit === "liter") {
-          packSize = Math.round(val * 1000);
-          fallbackUnit = unit === "kg" ? "GRAM" : "ML";
-        } else {
-          packSize = Math.round(val);
-          fallbackUnit = unit === "ml" ? "ML" : "GRAM";
-        }
-        continue;
-      }
-
-      // Pack count token: 2pcs, 3x, 5box, 10biji
-      const pcsMatch = tokLower.match(/^(\d+)(pcs|pc|x|pack|bks|box|bh|buah|dus)$/);
-      if (pcsMatch) {
-        packCount = parseInt(pcsMatch[1], 10);
-        continue;
-      }
-
-      // Price token: 48000, 120rb, 48k
-      const priceVal = parseShorthandPrice(tok);
-      if (priceVal !== null) {
-        totalPrice = priceVal;
-        continue;
-      }
-
-      // Plain small number could be packCount if packSize is already known
-      if (/^\d{1,3}$/.test(tokLower)) {
-        const n = parseInt(tokLower, 10);
-        if (packSize > 0) packCount = n;
-        else packSize = n;
-        continue;
-      }
-
-      // Material fuzzy match
-      const found = fuzzyFind(tokLower, MATERIAL_KEYWORDS);
-      if (found) {
-        matchedMat = found.match;
-        if (found.wasCorrected) {
-          corrections.push({ original: tok, correctedTo: found.match.materialName });
-        }
-      } else {
-        unknownWords.push(tok);
-      }
-    }
-
-    const materialName =
-      matchedMat?.materialName ||
-      (unknownWords.length ? unknownWords.join(" ") : "Bahan Baku");
-    const baseUnit = matchedMat?.baseUnit || fallbackUnit;
-
-    // If user wrote "masuk box bento 50pcs 110000" where unit is PIECE and packSize is 0
-    const effectivePackSize = packSize > 0 ? packSize : 1;
-    const quantityAdded = effectivePackSize * packCount;
-    const unitCost =
-      totalPrice > 0 && quantityAdded > 0
-        ? Math.round((totalPrice / quantityAdded) * 100) / 100
-        : 0;
-
-    if (quantityAdded > 0 && (matchedMat || unknownWords.length > 0)) {
+    if (parsedItems.length === 1) {
       return {
         type: "RESTOCK",
-        materialId: matchedMat?.materialId,
-        materialName,
-        baseUnit,
-        packSize: effectivePackSize,
-        packCount,
-        quantityAdded,
+        ...parsedItems[0],
+        corrections,
+      };
+    }
+
+    if (parsedItems.length > 1) {
+      const totalPrice = parsedItems.reduce((sum, it) => sum + it.totalPrice, 0);
+      return {
+        type: "RESTOCK_BATCH",
+        items: parsedItems,
         totalPrice,
-        unitCost,
         corrections,
       };
     }
   }
+
+function parseOrderTokens(
+  orderTokens: string[],
+  corrections: CorrectionNote[],
+): ParsedAction | null {
+  let slotDate = getDateOffset(0);
+  let slotLabel = "Hari Ini";
+  const itemsMap = new Map<
+    string,
+    { sku: string; productName: string; quantity: number; unitPrice: number }
+  >();
+  const nameTokens: string[] = [];
+  let pendingQty = 1;
+  let seenFirstItem = false;
+
+  for (let i = 0; i < orderTokens.length; i++) {
+    const tok = orderTokens[i];
+    const tokLower = tok.toLowerCase();
+
+    if (tokLower === "besok" || levenshtein(tokLower, "besok") <= 1) {
+      if (tokLower !== "besok") corrections.push({ original: tok, correctedTo: "besok" });
+      slotDate = getDateOffset(1);
+      slotLabel = "Besok";
+      continue;
+    }
+    if (tokLower === "lusa") {
+      slotDate = getDateOffset(2);
+      slotLabel = "Lusa";
+      continue;
+    }
+    if (tokLower === "hari" && orderTokens[i + 1]?.toLowerCase() === "ini") {
+      slotDate = getDateOffset(0);
+      slotLabel = "Hari Ini";
+      i++;
+      continue;
+    }
+
+    if (/^\d{1,2}$/.test(tokLower)) {
+      pendingQty = parseInt(tokLower, 10);
+      seenFirstItem = true;
+      continue;
+    }
+
+    const qtyX = tokLower.match(/^(\d{1,2})x$/);
+    if (qtyX) {
+      pendingQty = parseInt(qtyX[1], 10);
+      seenFirstItem = true;
+      continue;
+    }
+
+    const foundProd = fuzzyFind(tokLower, PRODUCT_KEYWORDS);
+    if (foundProd) {
+      seenFirstItem = true;
+      if (foundProd.wasCorrected) {
+        corrections.push({ original: tok, correctedTo: foundProd.match.productName });
+      }
+      const existing = itemsMap.get(foundProd.match.sku);
+      const fin = FINANCIAL_MASTER[foundProd.match.sku];
+      const unitPrice = fin?.promoPrice || fin?.sellingPrice || foundProd.match.unitPrice;
+      if (existing) {
+        existing.quantity += pendingQty;
+      } else {
+        itemsMap.set(foundProd.match.sku, {
+          sku: foundProd.match.sku,
+          productName: foundProd.match.productName,
+          quantity: pendingQty,
+          unitPrice,
+        });
+      }
+      pendingQty = 1;
+      continue;
+    }
+
+    if (!seenFirstItem) {
+      nameTokens.push(tok);
+    }
+  }
+
+  const items = Array.from(itemsMap.values());
+  if (items.length === 0) return null;
+
+  const customerName = nameTokens.length
+    ? nameTokens.map((n) => n.charAt(0).toUpperCase() + n.slice(1)).join(" ")
+    : "Pelanggan Walk-in";
+  const totalAmount = items.reduce((s, it) => s + it.unitPrice * it.quantity, 0);
+  return {
+    type: "ORDER",
+    customerName,
+    slotDate,
+    slotLabel,
+    items,
+    totalAmount,
+    corrections,
+  };
+}
 
   // 4. Order command: "order Budi 2 bento 1 matcha besok"
   const isOrder =
@@ -324,97 +521,18 @@ export function parseQuickChatCommand(rawInput: string): ParsedAction {
     if (firstWord !== "order" && firstWord !== "pesan") {
       corrections.push({ original: tokens[0], correctedTo: "order" });
     }
+    const parsedOrder = parseOrderTokens(tokens.slice(1), corrections);
+    if (parsedOrder) return parsedOrder;
+  }
 
-    let slotDate = getDateOffset(0);
-    let slotLabel = "Hari Ini";
-    const itemsMap = new Map<
-      string,
-      { sku: string; productName: string; quantity: number; unitPrice: number }
-    >();
-    const nameTokens: string[] = [];
-    let pendingQty = 1;
-    let seenFirstItem = false;
-
-    for (let i = 1; i < tokens.length; i++) {
-      const tok = tokens[i];
-      const tokLower = tok.toLowerCase();
-
-      if (tokLower === "besok" || levenshtein(tokLower, "besok") <= 1) {
-        if (tokLower !== "besok") corrections.push({ original: tok, correctedTo: "besok" });
-        slotDate = getDateOffset(1);
-        slotLabel = "Besok";
-        continue;
-      }
-      if (tokLower === "lusa") {
-        slotDate = getDateOffset(2);
-        slotLabel = "Lusa";
-        continue;
-      }
-      if (tokLower === "hari" && tokens[i + 1]?.toLowerCase() === "ini") {
-        slotDate = getDateOffset(0);
-        slotLabel = "Hari Ini";
-        i++;
-        continue;
-      }
-
-      if (/^\d{1,2}$/.test(tokLower)) {
-        pendingQty = parseInt(tokLower, 10);
-        seenFirstItem = true;
-        continue;
-      }
-
-      // Check 2x / 3x shorthand
-      const qtyX = tokLower.match(/^(\d{1,2})x$/);
-      if (qtyX) {
-        pendingQty = parseInt(qtyX[1], 10);
-        seenFirstItem = true;
-        continue;
-      }
-
-      const foundProd = fuzzyFind(tokLower, PRODUCT_KEYWORDS);
-      if (foundProd) {
-        seenFirstItem = true;
-        if (foundProd.wasCorrected) {
-          corrections.push({ original: tok, correctedTo: foundProd.match.productName });
-        }
-        const existing = itemsMap.get(foundProd.match.sku);
-        const fin = FINANCIAL_MASTER[foundProd.match.sku];
-        const unitPrice = fin?.promoPrice || fin?.sellingPrice || foundProd.match.unitPrice;
-        if (existing) {
-          existing.quantity += pendingQty;
-        } else {
-          itemsMap.set(foundProd.match.sku, {
-            sku: foundProd.match.sku,
-            productName: foundProd.match.productName,
-            quantity: pendingQty,
-            unitPrice,
-          });
-        }
-        pendingQty = 1;
-        continue;
-      }
-
-      if (!seenFirstItem) {
-        nameTokens.push(tok);
-      }
-    }
-
-    const items = Array.from(itemsMap.values());
-    if (items.length > 0) {
-      const customerName = nameTokens.length
-        ? nameTokens.map((n) => n.charAt(0).toUpperCase() + n.slice(1)).join(" ")
-        : "Pelanggan Walk-in";
-      const totalAmount = items.reduce((s, it) => s + it.unitPrice * it.quantity, 0);
-      return {
-        type: "ORDER",
-        customerName,
-        slotDate,
-        slotLabel,
-        items,
-        totalAmount,
-        corrections,
-      };
-    }
+  // 5. WhatsApp / Paste-Order fallback (e.g., "Nama: Ani\nPesan: 2 ori 1 matcha\nBesok")
+  const cleanedWaText = trimmed
+    .replace(/\b(nama|pemesan|customer|pesan|pesanan|order|slot|tanggal|jadwal)\s*:/gi, " ")
+    .replace(/[*•\-\/,]+/g, " ");
+  const waTokens = cleanedWaText.split(/\s+/).filter(Boolean);
+  if (waTokens.length >= 2) {
+    const parsedWa = parseOrderTokens(waTokens, corrections);
+    if (parsedWa) return parsedWa;
   }
 
   return {

@@ -5,6 +5,7 @@ import crypto from "node:crypto";
 import { desc, eq } from "drizzle-orm";
 import { getDb, isDatabaseConfigured, schema } from "@/db";
 import { calculateMovingAverageCost, calculateROE, FINANCIAL_MASTER } from "@/lib/finance";
+import { BOM_RECIPES } from "@/lib/mrp-calculator";
 
 export type OrderStatus =
   | "PENDING_PAYMENT"
@@ -659,6 +660,45 @@ export async function recordMaterialRestock(input: {
   };
 }
 
+const BOM_TO_STORE_CODE: Record<string, string> = {
+  "RAW-KEJU-CALF": "RM-CALF",
+  "RAW-FIBERCREME": "RM-FIBERCREME",
+  "RAW-TELUR": "RM-EGG",
+  "RAW-PONDAN": "RM-PONDAN",
+  "RAW-GULA": "RM-GULA",
+  "RAW-MAIZENA": "RM-MAIZENA",
+  "RAW-VANILLA": "RM-VANILLA",
+  "RAW-GARAM": "RM-GARAM",
+  "RAW-ZENLATTE-MATCHA": "RM-MATCHA",
+  "RAW-CHOCOLATOS": "RM-CHOCOLATOS",
+  "PKG-BOX-BAGASSE": "PK-BENTO",
+  "PKG-SENDOK-KAYU": "PK-SENDOK",
+  "PKG-BOX-KRAFT": "PK-WHOLE",
+};
+
+function computeOrderDeductions(
+  items: { sku: string; quantity: number }[],
+): Record<string, number> {
+  const deductions: Record<string, number> = {};
+  for (const it of items) {
+    const bom = BOM_RECIPES[it.sku];
+    if (!bom) continue;
+    for (const [bomCode, perUnit] of Object.entries(bom.materials)) {
+      const storeCode = BOM_TO_STORE_CODE[bomCode];
+      if (storeCode) {
+        deductions[storeCode] = (deductions[storeCode] || 0) + perUnit * it.quantity;
+      }
+    }
+    for (const [pkgCode, perUnit] of Object.entries(bom.packaging)) {
+      const storeCode = BOM_TO_STORE_CODE[pkgCode];
+      if (storeCode) {
+        deductions[storeCode] = (deductions[storeCode] || 0) + perUnit * it.quantity;
+      }
+    }
+  }
+  return deductions;
+}
+
 export async function updateOrderStatus(
   orderId: string,
   status: OrderStatus,
@@ -668,15 +708,80 @@ export async function updateOrderStatus(
     const state = readDevStore();
     const ord = state.orders.find((o) => o.id === orderId);
     if (!ord) return null;
+    const shouldDeduct =
+      status === "BAKING" &&
+      (ord.status === "PENDING_PAYMENT" || ord.status === "CONFIRMED_SLOT");
     ord.status = status;
+    if (shouldDeduct) {
+      const deductions = computeOrderDeductions(ord.items);
+      for (const mat of state.rawMaterials) {
+        const used = deductions[mat.code];
+        if (used && used > 0) {
+          mat.currentStock = Math.max(
+            0,
+            Math.round((mat.currentStock - used) * 100) / 100,
+          );
+          mat.updatedAt = new Date().toISOString();
+          state.stockLedger.unshift({
+            id: `sl-${crypto.randomUUID().slice(0, 8)}`,
+            rawMaterialId: mat.id,
+            materialName: mat.name,
+            transactionType: "ORDER_DEDUCTION",
+            quantityChange: -used,
+            balanceAfter: mat.currentStock,
+            unitCost: mat.movingAvgCost,
+            totalCost: Math.round(used * mat.movingAvgCost),
+            notes: `Oven ${ord.orderNumber} (${ord.customerName})`,
+            createdAt: new Date().toISOString(),
+          });
+        }
+      }
+      state.stockLedger = state.stockLedger.slice(0, 100);
+    }
     writeDevStore(state);
     return ord;
   }
+
+  const prevState = await getFullStoreState();
+  const prevOrd = prevState.orders.find((o) => o.id === orderId);
+  if (!prevOrd) return null;
+
+  const shouldDeduct =
+    status === "BAKING" &&
+    (prevOrd.status === "PENDING_PAYMENT" || prevOrd.status === "CONFIRMED_SLOT");
 
   await db
     .update(schema.orders)
     .set({ status })
     .where(eq(schema.orders.id, orderId));
+
+  if (shouldDeduct) {
+    const deductions = computeOrderDeductions(prevOrd.items);
+    for (const mat of prevState.rawMaterials) {
+      const used = deductions[mat.code];
+      if (used && used > 0) {
+        const nextStock = Math.max(
+          0,
+          Math.round((mat.currentStock - used) * 100) / 100,
+        );
+        await db
+          .update(schema.rawMaterials)
+          .set({ currentStock: nextStock.toFixed(2) })
+          .where(eq(schema.rawMaterials.id, mat.id));
+        await db.insert(schema.stockLedger).values({
+          id: `sl-${crypto.randomUUID().slice(0, 8)}`,
+          rawMaterialId: mat.id,
+          transactionType: "ORDER_DEDUCTION",
+          quantityChange: (-used).toFixed(3),
+          balanceAfter: nextStock.toFixed(3),
+          unitCost: mat.movingAvgCost.toFixed(2),
+          totalCost: Math.round(used * mat.movingAvgCost).toFixed(2),
+          referenceId: prevOrd.orderNumber,
+          notes: `Oven ${prevOrd.orderNumber} (${prevOrd.customerName})`,
+        });
+      }
+    }
+  }
 
   const state = await getFullStoreState();
   return state.orders.find((o) => o.id === orderId) || null;
@@ -754,17 +859,111 @@ export async function addOpexRecord(input: {
   return record;
 }
 
+export async function deleteEquityRecord(id: string): Promise<boolean> {
+  const db = getDb();
+  if (!db) {
+    const state = readDevStore();
+    const before = state.equities.length;
+    state.equities = state.equities.filter((e) => e.id !== id);
+    if (state.equities.length !== before) writeDevStore(state);
+    return state.equities.length !== before;
+  }
+  await db.delete(schema.ownerEquity).where(eq(schema.ownerEquity.id, id));
+  return true;
+}
+
+export async function deleteOpexRecord(id: string): Promise<boolean> {
+  const db = getDb();
+  if (!db) {
+    const state = readDevStore();
+    const before = state.opex.length;
+    state.opex = state.opex.filter((o) => o.id !== id);
+    if (state.opex.length !== before) writeDevStore(state);
+    return state.opex.length !== before;
+  }
+  await db.delete(schema.opexExpenses).where(eq(schema.opexExpenses.id, id));
+  return true;
+}
+
+export async function adjustMaterialStock(input: {
+  materialId: string;
+  quantityChange: number;
+  notes?: string;
+}): Promise<RawMaterialRecord | null> {
+  const db = getDb();
+  const txType: StockLedgerRecord["transactionType"] =
+    input.quantityChange < 0 ? "WASTE_ADJUSTMENT" : "GOODS_RECEIPT";
+
+  if (!db) {
+    const state = readDevStore();
+    const mat = state.rawMaterials.find((m) => m.id === input.materialId);
+    if (!mat) return null;
+    mat.currentStock = Math.max(
+      0,
+      Math.round((mat.currentStock + input.quantityChange) * 100) / 100,
+    );
+    mat.updatedAt = new Date().toISOString();
+    state.stockLedger.unshift({
+      id: `sl-${crypto.randomUUID().slice(0, 8)}`,
+      rawMaterialId: mat.id,
+      materialName: mat.name,
+      transactionType: txType,
+      quantityChange: input.quantityChange,
+      balanceAfter: mat.currentStock,
+      unitCost: mat.movingAvgCost,
+      totalCost: Math.round(Math.abs(input.quantityChange) * mat.movingAvgCost),
+      notes: input.notes || "Penyesuaian stok manual",
+      createdAt: new Date().toISOString(),
+    });
+    state.stockLedger = state.stockLedger.slice(0, 100);
+    writeDevStore(state);
+    return mat;
+  }
+
+  const rows = await db
+    .select()
+    .from(schema.rawMaterials)
+    .where(eq(schema.rawMaterials.id, input.materialId));
+  const matRow = rows[0];
+  if (!matRow) return null;
+  const nextStock = Math.max(
+    0,
+    Math.round((Number(matRow.currentStock) + input.quantityChange) * 100) / 100,
+  );
+  await db
+    .update(schema.rawMaterials)
+    .set({ currentStock: nextStock.toFixed(2) })
+    .where(eq(schema.rawMaterials.id, matRow.id));
+  await db.insert(schema.stockLedger).values({
+    id: `sl-${crypto.randomUUID().slice(0, 8)}`,
+    rawMaterialId: matRow.id,
+    transactionType: txType,
+    quantityChange: input.quantityChange.toFixed(3),
+    balanceAfter: nextStock.toFixed(3),
+    unitCost: Number(matRow.movingAvgCost).toFixed(2),
+    totalCost: Math.round(
+      Math.abs(input.quantityChange) * Number(matRow.movingAvgCost),
+    ).toFixed(2),
+    notes: input.notes || "Penyesuaian stok manual",
+  });
+  const state = await getFullStoreState();
+  return state.rawMaterials.find((m) => m.id === matRow.id) || null;
+}
+
 export async function getDashboardSummary() {
   const state = await getFullStoreState();
+  const currentMonth = getCurrentMonth();
   const activeOrders = state.orders.filter((o) => o.status !== "CANCELLED");
+  const monthlyOrders = activeOrders.filter((o) =>
+    o.slotDate.startsWith(currentMonth),
+  );
 
-  const totalRevenue = activeOrders.reduce((acc, o) => acc + o.totalAmount, 0);
-  const totalHpp = activeOrders.reduce((acc, o) => acc + o.totalHpp, 0);
+  const totalRevenue = monthlyOrders.reduce((acc, o) => acc + o.totalAmount, 0);
+  const totalHpp = monthlyOrders.reduce((acc, o) => acc + o.totalHpp, 0);
   const grossProfit = totalRevenue - totalHpp;
   const grossMarginPct =
     totalRevenue > 0 ? Math.round((grossProfit / totalRevenue) * 10000) / 100 : 0;
 
-  const currentMonth = getCurrentMonth();
   const monthlyOpex = state.opex
     .filter((op) => op.periodMonth === currentMonth)
     .reduce((acc, op) => acc + op.amount, 0);
@@ -773,8 +972,8 @@ export async function getDashboardSummary() {
   const totalEquity = state.equities.reduce((acc, e) => acc + e.amount, 0);
   const roePct = calculateROE(netProfit, totalEquity);
 
-  // BEP calculation (based on avg bento contribution margin ~ Rp 20.000)
-  const totalUnitsSold = activeOrders.reduce(
+  // BEP calculation (current month units sold vs 144 loyang target)
+  const totalUnitsSold = monthlyOrders.reduce(
     (sum, o) =>
       sum +
       o.items.reduce(
@@ -852,7 +1051,7 @@ export async function getDashboardSummary() {
       todayBookedUnits,
       dailySlotCapacity: state.dailySlotCapacity,
       lowStockCount,
-      totalOrders: activeOrders.length,
+      totalOrders: monthlyOrders.length,
     },
     chartSeries,
     productMix,

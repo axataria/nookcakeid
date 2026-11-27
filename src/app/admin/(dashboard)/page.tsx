@@ -87,6 +87,8 @@ export default function AdminDashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+  const [orderFilter, setOrderFilter] = useState<"ALL" | "ACTIVE" | "DELIVERED" | "CANCELLED">("ALL");
+  const [orderSearch, setOrderSearch] = useState("");
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -389,8 +391,58 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex gap-1 bg-[#FAF8F5] p-1 rounded-xl border border-[#E8E1D5]">
+              {(
+                [
+                  { id: "ALL", label: "Semua" },
+                  { id: "ACTIVE", label: "Aktif" },
+                  { id: "DELIVERED", label: "Selesai" },
+                  { id: "CANCELLED", label: "Batal" },
+                ] as const
+              ).map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setOrderFilter(tab.id)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold transition-colors ${
+                    orderFilter === tab.id
+                      ? "bg-[#0E5B44] text-white"
+                      : "text-[#687E6C] hover:text-[#00332A]"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <input
+              type="text"
+              value={orderSearch}
+              onChange={(e) => setOrderSearch(e.target.value)}
+              placeholder="Cari nama / #ORD..."
+              className="flex-1 px-3 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#E8E1D5] text-xs font-mono text-[#00332A] focus:outline-none focus:border-[#0E5B44]"
+            />
+          </div>
+
           <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
-            {orders.map((ord) => {
+            {orders
+              .filter((ord) => {
+                if (orderFilter === "ACTIVE") {
+                  return ord.status !== "DELIVERED" && ord.status !== "CANCELLED";
+                }
+                if (orderFilter === "DELIVERED") return ord.status === "DELIVERED";
+                if (orderFilter === "CANCELLED") return ord.status === "CANCELLED";
+                return true;
+              })
+              .filter((ord) => {
+                const q = orderSearch.trim().toLowerCase();
+                if (!q) return true;
+                return (
+                  ord.customerName.toLowerCase().includes(q) ||
+                  ord.orderNumber.toLowerCase().includes(q)
+                );
+              })
+              .map((ord) => {
               const badge = STATUS_BADGE[ord.status];
               const nextInfo = NEXT_STATUS[ord.status];
               return (
@@ -418,10 +470,20 @@ export default function AdminDashboardPage() {
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between sm:justify-end gap-3">
+                  <div className="flex items-center justify-between sm:justify-end gap-2">
                     <span className="font-mono font-bold text-xs text-[#00332A]">
                       {formatRupiah(ord.totalAmount)}
                     </span>
+                    {ord.status !== "DELIVERED" && ord.status !== "CANCELLED" && (
+                      <button
+                        type="button"
+                        disabled={updatingOrderId === ord.id}
+                        onClick={() => void advanceOrder(ord.id, "CANCELLED")}
+                        className="px-2.5 py-1.5 rounded-xl border border-rose-200 hover:bg-rose-50 text-rose-700 text-[11px] font-bold transition-colors disabled:opacity-50"
+                      >
+                        Batal
+                      </button>
+                    )}
                     {nextInfo && (
                       <button
                         type="button"

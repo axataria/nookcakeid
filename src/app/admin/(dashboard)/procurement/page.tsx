@@ -1,26 +1,85 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FileText,
-  Truck,
-  CheckCircle2,
-  Clock,
   Calculator,
-  ArrowRight,
   Plus,
-  Building2,
+  CheckCircle2,
 } from 'lucide-react';
 import { calculateMovingAverageCost } from '@/lib/finance';
 import { formatRupiah } from '@/lib/format';
 
+interface MaterialOption {
+  id: string;
+  name: string;
+  baseUnit: string;
+  currentStock: number;
+  movingAvgCost: number;
+}
+
 export default function ProcurementPage() {
+  const [materials, setMaterials] = useState<MaterialOption[]>([]);
+  const [selectedMatId, setSelectedMatId] = useState<string>('');
   // Moving Average Simulation State
-  const [currentQty, setCurrentQty] = useState<number>(3200); // 3200 grams
-  const [oldCost, setOldCost] = useState<number>(121.65); // Rp 121.65 / gram
-  const [receivedQty, setReceivedQty] = useState<number>(5000); // 5000 grams
-  const [vendorPrice, setVendorPrice] = useState<number>(118.0); // Rp 118.00 / gram
-  const [freightCost, setFreightCost] = useState<number>(25000); // Rp 25.000
+  const [currentQty, setCurrentQty] = useState<number>(3200);
+  const [oldCost, setOldCost] = useState<number>(120);
+  const [receivedQty, setReceivedQty] = useState<number>(200);
+  const [vendorPrice, setVendorPrice] = useState<number>(120);
+  const [freightCost, setFreightCost] = useState<number>(0);
+  const [savingGrn, setSavingGrn] = useState(false);
+  const [grnMessage, setGrnMessage] = useState<string>('');
+
+  useEffect(() => {
+    fetch('/api/admin/dashboard', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (Array.isArray(data?.rawMaterials) && data.rawMaterials.length > 0) {
+          const mats = data.rawMaterials as MaterialOption[];
+          setMaterials(mats);
+          setSelectedMatId(mats[0].id);
+          setCurrentQty(mats[0].currentStock);
+          setOldCost(mats[0].movingAvgCost);
+          setVendorPrice(mats[0].movingAvgCost);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const selectedMat = materials.find((m) => m.id === selectedMatId);
+
+  const handleSaveGrn = async () => {
+    if (!selectedMat || receivedQty <= 0) return;
+    setSavingGrn(true);
+    setGrnMessage('');
+    try {
+      const totalPrice = Math.round(receivedQty * vendorPrice + freightCost);
+      const res = await fetch('/api/admin/chat/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: {
+            type: 'RESTOCK',
+            materialId: selectedMat.id,
+            materialName: selectedMat.name,
+            baseUnit: selectedMat.baseUnit,
+            packSize: receivedQty,
+            packCount: 1,
+            quantityAdded: receivedQty,
+            totalPrice,
+            unitCost: Math.round((totalPrice / receivedQty) * 100) / 100,
+            corrections: [],
+          },
+        }),
+      });
+      if (res.ok) {
+        setGrnMessage(`Stok ${selectedMat.name} (+${receivedQty}) tersimpan ke database!`);
+        setCurrentQty((prev) => prev + receivedQty);
+      }
+    } finally {
+      setSavingGrn(false);
+    }
+  };
 
   const newMovingAverage = calculateMovingAverageCost(
     currentQty,
@@ -71,6 +130,33 @@ export default function ProcurementPage() {
             </p>
           </div>
         </div>
+
+        {materials.length > 0 && (
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-2">
+            <label className="text-xs font-semibold text-[#78716C]">
+              Pilih Bahan Baku:
+            </label>
+            <select
+              value={selectedMatId}
+              onChange={(e) => {
+                const mat = materials.find((m) => m.id === e.target.value);
+                setSelectedMatId(e.target.value);
+                if (mat) {
+                  setCurrentQty(mat.currentStock);
+                  setOldCost(mat.movingAvgCost);
+                  setVendorPrice(mat.movingAvgCost);
+                }
+              }}
+              className="px-3 py-2 rounded-xl bg-[#FAF8F5] border border-[#E8E1D5] text-xs font-semibold text-[#1C1917]"
+            >
+              {materials.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name} ({m.currentStock} {m.baseUnit.toLowerCase()})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
           <div className="space-y-1">
@@ -135,10 +221,28 @@ export default function ProcurementPage() {
             </span>
           </div>
 
-          <div className="font-serif text-2xl font-bold">
-            Rp {newMovingAverage.toFixed(2)} / gram
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="font-serif text-2xl font-bold">
+              Rp {newMovingAverage.toFixed(2)} / unit
+            </div>
+            {selectedMat && (
+              <button
+                type="button"
+                disabled={savingGrn || receivedQty <= 0}
+                onClick={() => void handleSaveGrn()}
+                className="px-4 py-2 rounded-xl bg-[#1C1917] hover:bg-[#D97706] text-white text-xs font-bold transition-colors disabled:opacity-50"
+              >
+                {savingGrn ? 'Menyimpan...' : 'Simpan Penerimaan (GRN)'}
+              </button>
+            )}
           </div>
         </div>
+        {grnMessage && (
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#15803D]">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>{grnMessage}</span>
+          </div>
+        )}
       </div>
 
       {/* Open Purchase Orders Table */}

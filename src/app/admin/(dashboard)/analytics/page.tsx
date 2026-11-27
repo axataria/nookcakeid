@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   TrendingUp,
   DollarSign,
@@ -31,20 +31,21 @@ interface DashboardKpis {
 export default function AnalyticsPage() {
   const [kpis, setKpis] = useState<DashboardKpis | null>(null);
 
-  useEffect(() => {
-    let active = true;
-    fetch('/api/admin/dashboard', { cache: 'no-store' })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (active && data?.kpis) {
-          setKpis(data.kpis as DashboardKpis);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      active = false;
-    };
+  const loadKpis = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/dashboard', { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.kpis) setKpis(data.kpis as DashboardKpis);
+      }
+    } catch {
+      // ignore
+    }
   }, []);
+
+  useEffect(() => {
+    void loadKpis();
+  }, [loadKpis]);
 
   const totalRevenue = kpis?.totalRevenue ?? 0;
   const totalHpp = kpis?.totalHpp ?? 0;
@@ -85,7 +86,7 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      <RoeAndFinanceSection />
+      <RoeAndFinanceSection onUpdated={() => void loadKpis()} />
 
       {/* High-Level Financial Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

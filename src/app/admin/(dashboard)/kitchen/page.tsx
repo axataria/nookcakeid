@@ -18,10 +18,18 @@ import { calculateOvenBatches } from '@/lib/mrp-calculator';
 
 interface KitchenOrder {
   status: string;
+  slotDate: string;
   items: { sku: string; quantity: number }[];
 }
 
+function getLocalDateStr(offsetDays: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return d.toISOString().slice(0, 10);
+}
+
 export default function KitchenPage() {
+  const [slotFilter, setSlotFilter] = useState<'ALL' | 'TODAY' | 'TOMORROW'>('ALL');
   const [checklist, setChecklist] = useState<Record<string, boolean>>({
     step1: false,
     step2: false,
@@ -31,6 +39,17 @@ export default function KitchenPage() {
     step6: false,
   });
   const [orders, setOrders] = useState<KitchenOrder[]>([]);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(`kitchen-prep-${slotFilter}`);
+      if (saved) {
+        setChecklist(JSON.parse(saved) as Record<string, boolean>);
+      }
+    } catch {
+      // ignore
+    }
+  }, [slotFilter]);
 
   useEffect(() => {
     let active = true;
@@ -48,11 +67,27 @@ export default function KitchenPage() {
   }, []);
 
   const toggleCheck = (id: string) => {
-    setChecklist((prev) => ({ ...prev, [id]: !prev[id] }));
+    setChecklist((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      try {
+        localStorage.setItem(`kitchen-prep-${slotFilter}`, JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
   };
+
+  const todayStr = getLocalDateStr(0);
+  const tomorrowStr = getLocalDateStr(1);
 
   const activeOrderItems = orders
     .filter((o) => o.status !== 'CANCELLED' && o.status !== 'DELIVERED')
+    .filter((o) => {
+      if (slotFilter === 'TODAY') return o.slotDate === todayStr;
+      if (slotFilter === 'TOMORROW') return o.slotDate === tomorrowStr;
+      return true;
+    })
     .flatMap((o) =>
       o.items.map((it) => ({
         variant: (it.sku.includes('WHOLE')
@@ -90,8 +125,32 @@ export default function KitchenPage() {
           </h1>
         </div>
 
-        {/* 16:00 Cut-off Banner */}
-        <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-white border border-[#E8E1D5] shadow-subtle">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex gap-1 bg-white p-1 rounded-xl border border-[#E8E1D5]">
+            {(
+              [
+                { id: 'ALL', label: 'Semua Aktif' },
+                { id: 'TODAY', label: 'Hari Ini' },
+                { id: 'TOMORROW', label: 'Besok' },
+              ] as const
+            ).map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setSlotFilter(tab.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                  slotFilter === tab.id
+                    ? 'bg-[#1C1917] text-white'
+                    : 'text-[#78716C] hover:text-[#1C1917]'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* 16:00 Cut-off Banner */}
+          <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-white border border-[#E8E1D5] shadow-subtle">
           <Clock className="w-5 h-5 text-[#D97706]" />
           <div>
             <span className="text-[11px] font-semibold text-[#78716C] block">
@@ -100,6 +159,7 @@ export default function KitchenPage() {
             <span className="text-xs font-bold text-[#1C1917]">
               16:00 WIB (Kunci Otomatis)
             </span>
+          </div>
           </div>
         </div>
       </div>

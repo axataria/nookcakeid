@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { Percent, PlusCircle, Building2, Receipt } from "lucide-react";
+import { Percent, PlusCircle, Building2, Receipt, Trash2 } from "lucide-react";
 import { formatRupiah } from "@/lib/format";
 
 interface FinanceSnapshot {
@@ -27,12 +27,18 @@ interface FinanceSnapshot {
   }[];
 }
 
-export function RoeAndFinanceSection() {
+export function RoeAndFinanceSection({
+  onUpdated,
+}: {
+  onUpdated?: () => void;
+}) {
   const [snapshot, setSnapshot] = useState<FinanceSnapshot | null>(null);
   const [eqName, setEqName] = useState("");
   const [eqAmount, setEqAmount] = useState("");
+  const [eqCategory, setEqCategory] = useState("EQUIPMENT");
   const [opexName, setOpexName] = useState("");
   const [opexAmount, setOpexAmount] = useState("");
+  const [opexCategory, setOpexCategory] = useState("UTILITIES");
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -62,7 +68,7 @@ export function RoeAndFinanceSection() {
         body: JSON.stringify({
           kind,
           name: name.trim(),
-          category: kind === "EQUITY" ? "EQUIPMENT" : "UTILITIES",
+          category: kind === "EQUITY" ? eqCategory : opexCategory,
           amount,
         }),
       });
@@ -75,6 +81,22 @@ export function RoeAndFinanceSection() {
           setOpexAmount("");
         }
         await load();
+        onUpdated?.();
+      }
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (kind: "EQUITY" | "OPEX", id: string) => {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/finance?kind=${kind}&id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        await load();
+        onUpdated?.();
       }
     } finally {
       setSaving(false);
@@ -137,12 +159,22 @@ export function RoeAndFinanceSection() {
               onChange={(e) => setEqName(e.target.value)}
               className="flex-1 px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#D9D3C5] text-xs font-mono"
             />
+            <select
+              value={eqCategory}
+              onChange={(e) => setEqCategory(e.target.value)}
+              className="px-2.5 py-2 rounded-xl bg-[#FAF7F2] border border-[#D9D3C5] text-xs font-mono"
+            >
+              <option value="EQUIPMENT">Alat</option>
+              <option value="WORKING_CAPITAL">Modal Kerja</option>
+              <option value="RENOVATION">Renovasi</option>
+              <option value="OTHER">Lainnya</option>
+            </select>
             <input
               type="number"
               placeholder="Nominal Rp"
               value={eqAmount}
               onChange={(e) => setEqAmount(e.target.value)}
-              className="w-full sm:w-32 px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#D9D3C5] text-xs font-mono"
+              className="w-full sm:w-28 px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#D9D3C5] text-xs font-mono"
             />
             <button
               type="submit"
@@ -160,10 +192,24 @@ export function RoeAndFinanceSection() {
                 key={eq.id}
                 className="flex items-center justify-between text-xs font-mono py-2 px-3 rounded-xl bg-[#FAF8F5] border border-[#E8E1D5]"
               >
-                <span className="text-[#1C1917] font-semibold">{eq.name}</span>
-                <span className="font-bold text-[#0E5B44]">
-                  {formatRupiah(eq.amount)}
+                <span className="text-[#1C1917] font-semibold">
+                  {eq.name}{" "}
+                  <span className="text-[#78716C] font-normal">({eq.category})</span>
                 </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-[#0E5B44]">
+                    {formatRupiah(eq.amount)}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={saving}
+                    onClick={() => void handleDelete("EQUITY", eq.id)}
+                    aria-label="Hapus ekuitas"
+                    className="text-[#78716C] hover:text-[#BE123C] transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -187,12 +233,24 @@ export function RoeAndFinanceSection() {
               onChange={(e) => setOpexName(e.target.value)}
               className="flex-1 px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#D9D3C5] text-xs font-mono"
             />
+            <select
+              value={opexCategory}
+              onChange={(e) => setOpexCategory(e.target.value)}
+              className="px-2.5 py-2 rounded-xl bg-[#FAF7F2] border border-[#D9D3C5] text-xs font-mono"
+            >
+              <option value="UTILITIES">Listrik/Air/Gas</option>
+              <option value="RENT">Sewa</option>
+              <option value="MARKETING">Marketing</option>
+              <option value="PACKAGING_MISC">Kemasan</option>
+              <option value="LABOR">Tenaga Kerja</option>
+              <option value="OTHER">Lainnya</option>
+            </select>
             <input
               type="number"
               placeholder="Nominal Rp"
               value={opexAmount}
               onChange={(e) => setOpexAmount(e.target.value)}
-              className="w-full sm:w-32 px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#D9D3C5] text-xs font-mono"
+              className="w-full sm:w-28 px-3 py-2 rounded-xl bg-[#FAF7F2] border border-[#D9D3C5] text-xs font-mono"
             />
             <button
               type="submit"
@@ -213,12 +271,23 @@ export function RoeAndFinanceSection() {
                 <span className="text-[#1C1917] font-semibold">
                   {op.name}{" "}
                   <span className="text-[#78716C] font-normal">
-                    ({op.periodMonth})
+                    ({op.category} · {op.periodMonth})
                   </span>
                 </span>
-                <span className="font-bold text-[#BE123C]">
-                  {formatRupiah(op.amount)}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-[#BE123C]">
+                    {formatRupiah(op.amount)}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={saving}
+                    onClick={() => void handleDelete("OPEX", op.id)}
+                    aria-label="Hapus OPEX"
+                    className="text-[#78716C] hover:text-[#BE123C] transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>

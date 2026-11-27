@@ -16,13 +16,17 @@ import {
   Menu,
   X,
   Printer,
+  Download,
+  Share,
 } from 'lucide-react';
+import { useAdminPwa } from '@/components/admin/AdminPwaProvider';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const { canInstall, isIosSafari, isStandalone, triggerInstall } = useAdminPwa();
 
   const navItems = [
     {
@@ -91,7 +95,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen bg-[#FAF7F2] text-[#1C1917] flex flex-col md:flex-row">
       {/* Mobile Top Header (< 768px) */}
-      <header className="md:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#E8E1D5] px-4 py-3 flex items-center justify-between">
+      <header className="md:hidden sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#E8E1D5] px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Image
             src="/logo.png"
@@ -194,7 +198,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main Admin Content Body */}
-      <main className="flex-grow p-4 sm:p-8 pb-24 md:pb-8 overflow-y-auto">
+      <main className="flex-grow p-4 sm:p-8 pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-8 overflow-y-auto">
         {children}
       </main>
 
@@ -245,6 +249,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Store className="w-4 h-4 text-[#0E5B44]" />
               <span>Lihat Toko Pelanggan</span>
             </a>
+            {canInstall && (
+              <button
+                type="button"
+                onClick={async () => {
+                  setMoreOpen(false);
+                  await triggerInstall();
+                }}
+                className="w-full flex items-center gap-3 p-3 rounded-2xl bg-[#0E5B44] text-sm font-semibold text-white"
+              >
+                <Download className="w-4 h-4 text-[#C4DE6E]" />
+                <span>Pasang Aplikasi Admin (PWA)</span>
+              </button>
+            )}
+            {!canInstall && isIosSafari && !isStandalone && (
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-[#0E5B44]/10 border border-[#0E5B44]/20 text-xs text-[#00332A]">
+                <Share className="w-4 h-4 text-[#0E5B44] shrink-0 mt-0.5" />
+                <span>
+                  Pasang di iPhone: ketuk tombol <strong>Share</strong> di Safari, lalu pilih <strong>Add to Home Screen</strong>.
+                </span>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -252,7 +277,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Mobile Sticky Bottom Navbar (< 768px) */}
       <nav
         aria-label="Navigasi cepat mobile"
-        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#E8E1D5] px-2 py-1.5 flex items-center justify-around shadow-[0_-8px_24px_rgba(0,0,0,0.06)]"
+        className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#E8E1D5] px-2 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_-8px_24px_rgba(0,0,0,0.06)]"
       >
         <Link
           href="/"
