@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ChefHat,
   Clock,
@@ -16,28 +16,61 @@ import {
 } from 'lucide-react';
 import { calculateOvenBatches } from '@/lib/mrp-calculator';
 
+interface KitchenOrder {
+  status: string;
+  items: { sku: string; quantity: number }[];
+}
+
 export default function KitchenPage() {
   const [checklist, setChecklist] = useState<Record<string, boolean>>({
-    step1: true,
-    step2: true,
-    step3: true,
+    step1: false,
+    step2: false,
+    step3: false,
     step4: false,
     step5: false,
     step6: false,
   });
+  const [orders, setOrders] = useState<KitchenOrder[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/admin/dashboard', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && Array.isArray(data?.orders)) {
+          setOrders(data.orders as KitchenOrder[]);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const toggleCheck = (id: string) => {
     setChecklist((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // Sample orders aggregated for Tomorrow's Slot (24 Nov 2026)
-  const tomorrowOrders = [
-    { variant: 'BENTO', quantity: 12 },
-    { variant: 'SLICE', quantity: 10 },
-    { variant: 'WHOLE', quantity: 1 },
-  ];
+  const activeOrderItems = orders
+    .filter((o) => o.status !== 'CANCELLED' && o.status !== 'DELIVERED')
+    .flatMap((o) =>
+      o.items.map((it) => ({
+        variant: (it.sku.includes('WHOLE')
+          ? 'WHOLE'
+          : it.sku.includes('SLICE')
+          ? 'SLICE'
+          : 'BENTO') as 'BENTO' | 'SLICE' | 'WHOLE',
+        quantity: it.quantity,
+      }))
+    );
 
-  const batchSummary = calculateOvenBatches(tomorrowOrders);
+  const batchSummary = calculateOvenBatches(activeOrderItems);
+  const todayLabel = new Date().toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -49,7 +82,7 @@ export default function KitchenPage() {
               Jadwal Panggangan Besok
             </span>
             <span className="text-xs text-[#78716C]">
-              Slot: <strong>Selasa, 24 November 2026</strong>
+              Slot Aktif: <strong>{todayLabel}</strong>
             </span>
           </div>
           <h1 className="font-serif text-3xl font-bold text-[#1C1917]">
