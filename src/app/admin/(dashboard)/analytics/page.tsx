@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   TrendingUp,
   DollarSign,
@@ -11,28 +11,52 @@ import {
   Target,
   Award,
 } from 'lucide-react';
-import {
-  FINANCIAL_MASTER,
-  MONTHLY_FIXED_OPEX,
-  BEP_MONTHLY_BENTO_UNITS,
-  calculateDailyProfit,
-} from '@/lib/finance';
+import { FINANCIAL_MASTER } from '@/lib/finance';
 import { formatRupiah } from '@/lib/format';
 import { RoeAndFinanceSection } from '@/components/admin/RoeAndFinanceSection';
 
+interface DashboardKpis {
+  totalRevenue: number;
+  totalHpp: number;
+  grossProfit: number;
+  grossMarginPct: number;
+  monthlyOpex: number;
+  netProfit: number;
+  totalUnitsSold: number;
+  bepTargetUnits: number;
+  bepProgressPct: number;
+  totalOrders: number;
+}
+
 export default function AnalyticsPage() {
-  // Sample month-to-date sales data
-  const sampleSales = [
-    { sku: 'CAKE-BENTO-10X7', quantity: 180, unitPrice: 59000 },
-    { sku: 'CAKE-SLICE-CLASSIC', quantity: 95, unitPrice: 40000 },
-    { sku: 'CAKE-WHOLE-16CM', quantity: 14, unitPrice: 195000 },
-    { sku: 'CAKE-BENTO-MATCHA', quantity: 35, unitPrice: 65000 },
-  ];
+  const [kpis, setKpis] = useState<DashboardKpis | null>(null);
 
-  const monthlyProfit = calculateDailyProfit(sampleSales, MONTHLY_FIXED_OPEX);
+  useEffect(() => {
+    let active = true;
+    fetch('/api/admin/dashboard', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data?.kpis) {
+          setKpis(data.kpis as DashboardKpis);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
 
-  const currentBentoSold = 180 + 35;
-  const bepPercent = Math.min(100, Math.round((currentBentoSold / BEP_MONTHLY_BENTO_UNITS) * 100));
+  const totalRevenue = kpis?.totalRevenue ?? 0;
+  const totalHpp = kpis?.totalHpp ?? 0;
+  const grossProfit = kpis?.grossProfit ?? 0;
+  const grossMarginPct = kpis?.grossMarginPct ?? 0;
+  const monthlyOpex = kpis?.monthlyOpex ?? 0;
+  const netProfit = kpis?.netProfit ?? 0;
+  const totalOrders = kpis?.totalOrders ?? 0;
+  const currentBentoSold = kpis?.totalUnitsSold ?? 0;
+  const bepTargetUnits = kpis?.bepTargetUnits ?? 41;
+  const bepPercent = kpis?.bepProgressPct ?? 0;
+  const bepReached = currentBentoSold >= bepTargetUnits;
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -56,7 +80,7 @@ export default function AnalyticsPage() {
           <ShieldCheck className="w-4 h-4 text-[#15803D]" />
           <span>
             Fixed OPEX Bulanan:{' '}
-            <strong className="text-[#1C1917]">{formatRupiah(MONTHLY_FIXED_OPEX)}</strong>
+            <strong className="text-[#1C1917]">{formatRupiah(monthlyOpex)}</strong>
           </span>
         </div>
       </div>
@@ -69,11 +93,11 @@ export default function AnalyticsPage() {
         <div className="p-5 rounded-3xl bg-white border border-[#E8E1D5] shadow-card space-y-1">
           <span className="text-xs text-[#78716C] font-semibold">Total Pendapatan Kotor</span>
           <p className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1917]">
-            {formatRupiah(monthlyProfit.grossRevenue)}
+            {formatRupiah(totalRevenue)}
           </p>
           <span className="text-[11px] text-[#15803D] flex items-center gap-1 font-medium">
             <ArrowUpRight className="w-3.5 h-3.5" />
-            <span>324 pesanan bulan ini</span>
+            <span>{totalOrders} pesanan bulan ini</span>
           </span>
         </div>
 
@@ -81,7 +105,7 @@ export default function AnalyticsPage() {
         <div className="p-5 rounded-3xl bg-white border border-[#E8E1D5] shadow-card space-y-1">
           <span className="text-xs text-[#78716C] font-semibold">Total HPP Bahan Baku</span>
           <p className="font-serif text-2xl sm:text-3xl font-bold text-[#78716C]">
-            {formatRupiah(monthlyProfit.totalHpp)}
+            {formatRupiah(totalHpp)}
           </p>
           <span className="text-[11px] text-[#78716C] block">
             Food cost + kemasan eco bagasse
@@ -92,10 +116,10 @@ export default function AnalyticsPage() {
         <div className="p-5 rounded-3xl bg-white border border-[#E8E1D5] shadow-card space-y-1">
           <span className="text-xs text-[#78716C] font-semibold">Laba Kotor (Gross Margin)</span>
           <p className="font-serif text-2xl sm:text-3xl font-bold text-[#D97706]">
-            {formatRupiah(monthlyProfit.grossProfit)}
+            {formatRupiah(grossProfit)}
           </p>
           <span className="text-[11px] text-[#B45309] font-bold block">
-            Margin Rata-rata: {monthlyProfit.grossMarginPct}%
+            Margin Rata-rata: {grossMarginPct}%
           </span>
         </div>
 
@@ -103,7 +127,7 @@ export default function AnalyticsPage() {
         <div className="p-5 rounded-3xl bg-[#FEF3C7] border border-[#FDE68A] shadow-card space-y-1 text-[#B45309]">
           <span className="text-xs font-semibold">Take-Home Pay Solo Baker</span>
           <p className="font-serif text-2xl sm:text-3xl font-bold">
-            {formatRupiah(monthlyProfit.netProfit)}
+            {formatRupiah(netProfit)}
           </p>
           <span className="text-[11px] block">
             Laba bersih setelah OPEX bulanan
@@ -122,13 +146,13 @@ export default function AnalyticsPage() {
               </h2>
             </div>
             <p className="text-xs text-[#78716C]">
-              Cukup <strong>41 Bento / bulan (~2 bento/hari)</strong> untuk menutup seluruh beban operasional tetap Rp 1.250.000.
+              Cukup <strong>{bepTargetUnits} Bento / bulan (~2 bento/hari)</strong> untuk menutup seluruh beban operasional tetap {formatRupiah(monthlyOpex)}.
             </p>
           </div>
 
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#DCFCE7] text-[#15803D] text-xs font-bold w-fit">
             <Award className="w-4 h-4" />
-            <span>BEP Terlampaui ({bepPercent}%)</span>
+            <span>{bepReached ? `BEP Terlampaui (${bepPercent}%)` : `Progress BEP (${bepPercent}%)`}</span>
           </div>
         </div>
 
@@ -142,7 +166,7 @@ export default function AnalyticsPage() {
           </div>
           <div className="flex justify-between text-[11px] text-[#78716C]">
             <span>0 Bento</span>
-            <span>BEP: 41 Bento (Tercapai)</span>
+            <span>BEP: {bepTargetUnits} Bento ({bepReached ? 'Tercapai' : 'Belum Tercapai'})</span>
             <span className="font-bold text-[#1C1917]">Realisasi: {currentBentoSold} Bento</span>
           </div>
         </div>
