@@ -723,7 +723,7 @@ export async function getDashboardSummary() {
       ),
     0,
   );
-  const bepTargetUnits = 41;
+  const bepTargetUnits = 39;
   const bepProgressPct = Math.min(100, Math.round((totalUnitsSold / bepTargetUnits) * 100));
 
   // Today's slot usage

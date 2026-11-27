@@ -28,15 +28,17 @@ export const BOM_RECIPES: Record<
     packaging: Record<string, number>;
   }
 > = {
-  // Bento Cake (10x7 cm)
+  // Bento Cake (10x7 cm) - Cheesecake Ori + Brownies Base (1 resep cheesecake = 2 loyang, 1 adonan brownies = 4 loyang)
   'CAKE-BENTO-10X7': {
     materials: {
       'RAW-KEJU-CALF': 100, // grams
-      'RAW-CREAM-ANCHOR': 55, // grams
-      'RAW-TELUR': 0.5, // pieces
-      'RAW-PONDAN': 57.5, // grams
-      'RAW-BUTTER': 25, // grams
+      'RAW-FIBERCREME': 25, // grams
+      'RAW-TELUR': 0.75, // pieces (0.5 cheesecake + 0.25 brownies)
+      'RAW-PONDAN': 0.25, // pcs Pondan Signature Brownie Mix
       'RAW-GULA': 30, // grams
+      'RAW-MAIZENA': 3, // grams
+      'RAW-VANILLA': 1.5, // grams
+      'RAW-GARAM': 1.25, // grams
     },
     packaging: {
       'PKG-BOX-BAGASSE': 1,
@@ -81,12 +83,14 @@ export const BOM_RECIPES: Record<
   'CAKE-BENTO-MATCHA': {
     materials: {
       'RAW-KEJU-CALF': 100,
-      'RAW-CREAM-ANCHOR': 55,
-      'RAW-TELUR': 0.5,
-      'RAW-PONDAN': 55,
-      'RAW-BUTTER': 25,
+      'RAW-FIBERCREME': 25,
+      'RAW-TELUR': 0.75,
+      'RAW-PONDAN': 0.25,
       'RAW-GULA': 30,
-      'RAW-MATCHA-UJI': 8,
+      'RAW-MAIZENA': 3,
+      'RAW-VANILLA': 1.5,
+      'RAW-GARAM': 1.25,
+      'RAW-ZENLATTE-MATCHA': 0.5, // sachet (1 bks / 2 loyang)
     },
     packaging: {
       'PKG-BOX-BAGASSE': 1,
@@ -118,13 +122,14 @@ export const BOM_RECIPES: Record<
   'CAKE-BENTO-CHOCO': {
     materials: {
       'RAW-KEJU-CALF': 100,
-      'RAW-CREAM-ANCHOR': 55,
-      'RAW-TELUR': 0.5,
-      'RAW-PONDAN': 55,
-      'RAW-BUTTER': 25,
-      'RAW-GULA': 25,
-      'RAW-COCOA-POWDER': 15,
-      'RAW-CHOC-CHIPS': 20,
+      'RAW-FIBERCREME': 25,
+      'RAW-TELUR': 0.75,
+      'RAW-PONDAN': 0.25,
+      'RAW-GULA': 30,
+      'RAW-MAIZENA': 3,
+      'RAW-VANILLA': 1.5,
+      'RAW-GARAM': 1.25,
+      'RAW-CHOCOLATOS': 0.5, // sachet (1 bks / 2 loyang)
     },
     packaging: {
       'PKG-BOX-BAGASSE': 1,

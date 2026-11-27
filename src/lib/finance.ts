@@ -23,12 +23,12 @@ export const FINANCIAL_MASTER: Record<string, ProductFinancials> = {
     name: 'Bento Cake (10x7 cm)',
     sellingPrice: 59000,
     promoPrice: 52000,
-    foodCost: 24330,
+    foodCost: 22428,
     packagingCost: 2640,
     overheadCost: 1400,
-    totalHpp: 28400,
-    grossProfit: 30600,
-    grossMarginPct: 51.86,
+    totalHpp: 26468,
+    grossProfit: 32532,
+    grossMarginPct: 55.14,
   },
   'CAKE-SLICE-CLASSIC': {
     sku: 'CAKE-SLICE-CLASSIC',
@@ -56,12 +56,12 @@ export const FINANCIAL_MASTER: Record<string, ProductFinancials> = {
     sku: 'CAKE-BENTO-MATCHA',
     name: 'The Uji Matcha Basque (10x7 cm)',
     sellingPrice: 65000,
-    foodCost: 27800,
+    foodCost: 23828,
     packagingCost: 2640,
     overheadCost: 1400,
-    totalHpp: 31840,
-    grossProfit: 33160,
-    grossMarginPct: 51.02,
+    totalHpp: 27868,
+    grossProfit: 37132,
+    grossMarginPct: 57.13,
   },
   'CAKE-BENTO-BISCOFF': {
     sku: 'CAKE-BENTO-BISCOFF',
@@ -78,12 +78,12 @@ export const FINANCIAL_MASTER: Record<string, ProductFinancials> = {
     sku: 'CAKE-BENTO-CHOCO',
     name: 'The Choco Basque (10 cm)',
     sellingPrice: 40000,
-    foodCost: 19800,
+    foodCost: 23728,
     packagingCost: 2640,
     overheadCost: 1400,
-    totalHpp: 23840,
-    grossProfit: 16160,
-    grossMarginPct: 40.4,
+    totalHpp: 27768,
+    grossProfit: 12232,
+    grossMarginPct: 30.58,
   },
   'CAKE-WHOLE-18CM': {
     sku: 'CAKE-WHOLE-18CM',
@@ -154,7 +154,7 @@ export const FINANCIAL_MASTER: Record<string, ProductFinancials> = {
 };
 
 export const MONTHLY_FIXED_OPEX = 1250000; // Rp 1.250.000 / month (Electricity, WiFi, Chiller, Domain)
-export const BEP_MONTHLY_BENTO_UNITS = 41; // Titik impas operasional
+export const BEP_MONTHLY_BENTO_UNITS = 39; // Titik impas operasional (Rp 1.250.000 / Rp 32.532)
 
 /**
  * Calculates Weighted Moving Average Cost for Raw Materials upon Goods Receipt (GRN)
