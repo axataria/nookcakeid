@@ -11,7 +11,7 @@ import {
   Target,
   Award,
 } from 'lucide-react';
-import { FINANCIAL_MASTER } from '@/lib/finance';
+import { ACTIVE_CATALOG_SKUS, FINANCIAL_MASTER } from '@/lib/finance';
 import { formatRupiah } from '@/lib/format';
 import { RoeAndFinanceSection } from '@/components/admin/RoeAndFinanceSection';
 
@@ -182,7 +182,7 @@ export default function AnalyticsPage() {
               Master HPP &amp; Gross Margin per Produk
             </h2>
           </div>
-          <span className="text-xs text-[#78716C]">Data Tervalidasi PRD v3.2</span>
+          <span className="text-xs text-[#78716C]">Sesuai Katalog &amp; Resep Aktif</span>
         </div>
 
         <div className="overflow-x-auto -mx-6 px-6">
@@ -199,7 +199,7 @@ export default function AnalyticsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#E8E1D5]">
-              {Object.values(FINANCIAL_MASTER).map((prod) => (
+              {ACTIVE_CATALOG_SKUS.map((sku) => FINANCIAL_MASTER[sku]).map((prod) => (
                 <tr key={prod.sku} className="hover:bg-[#FAF8F5]">
                   <td className="py-3.5">
                     <span className="font-bold text-[#1C1917] block">

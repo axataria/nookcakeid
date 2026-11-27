@@ -152,6 +152,15 @@ export const FINANCIAL_MASTER: Record<string, ProductFinancials> = {
   },
 };
 
+export const ACTIVE_CATALOG_SKUS = [
+  'CAKE-BURNT-CORNER-10CM',
+  'CAKE-MATCHA-BASQUE-10CM',
+  'CAKE-CHOCO-BASQUE-10CM',
+  'CAKE-WHOLE-18CM',
+  'SAUCE-CHOCOLATE-25ML',
+  'SAUCE-STRAWBERRY-25ML',
+] as const;
+
 export const MONTHLY_FIXED_OPEX = 1250000; // Rp 1.250.000 / month (Electricity, WiFi, Chiller, Domain)
 export const BEP_MONTHLY_BENTO_UNITS = 144; // Titik impas operasional (Rp 1.250.000 / Rp 8.682)
 
