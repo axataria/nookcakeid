@@ -27,7 +27,7 @@ export default function HomePage() {
         <BakerManifesto />
 
         {/* 6. FAQ & FOOTER */}
-        <footer className="relative overflow-hidden bg-[#EAE5D8] pt-16 pb-20 sm:pb-24 border-t border-[#00332A]/10">
+        <footer className="relative overflow-hidden bg-[#EAE5D8] pt-16 pb-28 sm:pb-24 border-t border-[#00332A]/10">
           {/* Oversized brand watermark */}
           <div
             aria-hidden="true"
@@ -105,7 +105,7 @@ export default function HomePage() {
                     key={q}
                     className="group border-b border-[#00332A]/15 pb-4 cursor-pointer"
                   >
-                    <summary className="font-display font-bold text-sm text-[#00332A] flex items-center justify-between">
+                    <summary className="font-display font-bold text-sm text-[#00332A] flex items-center justify-between py-1 list-none">
                       <span>{q}</span>
                       <span className="font-mono text-xs text-[#0E5B44] group-open:rotate-45 transition-transform">
                         +

@@ -37,6 +37,7 @@ export function CakeCard({
     setError("");
     addItem(product, quantity, addons, note);
     setJustAdded(true);
+    setIsOptionsOpen(false);
     setTimeout(() => setJustAdded(false), 1400);
     setQuantity(1);
   }
@@ -71,8 +72,8 @@ export function CakeCard({
         </div>
 
         <div className="pt-4">
-          <div className="flex items-baseline justify-between gap-2 mb-1.5">
-            <h3 className="font-display font-black text-lg sm:text-xl text-[#00332A] tracking-tight">
+          <div className="flex items-start justify-between gap-2 mb-1.5">
+            <h3 className="font-display font-black text-lg sm:text-xl text-[#00332A] tracking-tight leading-snug">
               {product.name}
             </h3>
             <div className="flex flex-col items-end shrink-0 leading-tight">
@@ -137,7 +138,10 @@ export function CakeCard({
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="font-display font-bold text-xs truncate leading-tight">
-                        {a.name.replace(" (25ml)", "")}
+                        {a.name
+                          .replace(" (25ml)", "")
+                          .replace("Chocolate ", "")
+                          .replace("Selai ", "")}
                       </p>
                       <p className="font-mono text-[10px] text-[#0E5B44] font-bold">
                         +{formatRupiah(a.price)}
@@ -231,14 +235,15 @@ export function CakeCard({
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-[#D9D3C5] flex items-center gap-3">
-        <div className="flex items-center border border-[#D9D3C5] rounded-xl bg-[#F4F1E8] px-2 py-1">
+      <div className="mt-4 pt-3 border-t border-[#D9D3C5] flex items-center gap-2.5">
+        <div className="flex items-center border border-[#D9D3C5] rounded-xl bg-[#F4F1E8] px-1 py-0.5 shrink-0">
           <motion.button
+            type="button"
             whileTap={{ scale: 0.86 }}
             aria-label={`Kurangi ${product.name}`}
             disabled={quantity <= 1}
             onClick={() => setQuantity((q) => q - 1)}
-            className="p-1 text-[#00332A] disabled:opacity-40"
+            className="w-8 h-8 flex items-center justify-center text-[#00332A] disabled:opacity-40"
           >
             <Minus className="w-3.5 h-3.5" />
           </motion.button>
@@ -246,19 +251,21 @@ export function CakeCard({
             {quantity}
           </output>
           <motion.button
+            type="button"
             whileTap={{ scale: 0.86 }}
             aria-label={`Tambah ${product.name}`}
             disabled={quantity >= max}
             onClick={() => setQuantity((q) => q + 1)}
-            className="p-1 text-[#00332A] disabled:opacity-40"
+            className="w-8 h-8 flex items-center justify-center text-[#00332A] disabled:opacity-40"
           >
             <Plus className="w-3.5 h-3.5" />
           </motion.button>
         </div>
 
         <motion.button
+          type="button"
           whileTap={{ scale: 0.95 }}
-          className="flex-1 py-2.5 px-3 rounded-xl bg-[#0E5B44] text-[#FAF7F0] font-display font-extrabold text-xs sm:text-sm hover:bg-[#0B4A37] transition-colors shadow-sm disabled:opacity-50"
+          className="flex-1 py-2.5 px-3 rounded-xl bg-[#0E5B44] text-[#FAF7F0] font-display font-extrabold text-xs sm:text-sm hover:bg-[#0B4A37] transition-colors shadow-sm disabled:opacity-50 whitespace-nowrap"
           onClick={add}
           disabled={max === 0}
         >

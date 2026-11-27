@@ -28,12 +28,12 @@ export function CartBottomBar() {
             className="shadow-lg hover:shadow-xl transition-shadow"
           >
             <span className="flex items-center gap-2.5">
-              <ShoppingBag className="w-4 h-4 text-amber-200" />
+              <ShoppingBag className="w-4 h-4 text-[#C4DE6E]" />
               <span>
                 <strong>{s.getTotalCount()} item</strong> · {formatRupiah(s.getSubtotal())}
               </span>
             </span>
-            <span className="font-semibold text-amber-100">Lihat keranjang ↗</span>
+            <span className="font-semibold text-[#C4DE6E]">Lihat keranjang ↗</span>
           </motion.button>
         </motion.div>
       )}

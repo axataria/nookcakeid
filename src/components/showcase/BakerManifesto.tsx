@@ -67,6 +67,14 @@ export function BakerManifesto() {
       </div>
 
       <div className="relative w-full overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 left-0 w-10 sm:w-24 z-10 bg-gradient-to-r from-[#EAE5D8] to-transparent"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 right-0 w-10 sm:w-24 z-10 bg-gradient-to-l from-[#EAE5D8] to-transparent"
+        />
         <div className="flex gap-6 w-max animate-marquee-left hover:[animation-play-state:paused] px-3">
           {loopItems.map((item, idx) => (
             <TestimonialCard key={`${item.name}-${idx}`} item={item} />
