@@ -71,6 +71,7 @@ interface ChatMessage {
 
 const SHORTCUTS = [
   { label: "+ Order", template: "order Budi 2 bento 1 matcha besok" },
+  { label: "+ Order Lama", template: "order lama Budi 2 ori 1 matcha 15/11" },
   { label: "+ Stok", template: "masuk calf 200g 24rb, fibercreme 100g 16rb" },
   { label: "+ OPEX", template: "opex listrik 350rb" },
   { label: "Cek Laba", template: "cek laba", autoSend: true },
@@ -306,12 +307,19 @@ export function QuickChatPanel({
                           <div className="flex items-center justify-between">
                             <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0E5B44]">
                               <ShoppingBag className="w-3.5 h-3.5" />
-                              Catat Pesanan Baru
+                              {msg.parsed.isHistorical
+                                ? "Catat Histori Pesanan (Selesai)"
+                                : "Catat Pesanan Baru"}
                             </span>
                             <span className="text-[11px] font-mono text-[#78716C]">
                               Slot: {msg.parsed.slotLabel} ({msg.parsed.slotDate})
                             </span>
                           </div>
+                          {msg.parsed.isHistorical && (
+                            <div className="text-[10px] font-mono text-[#15803D] bg-[#DCFCE7] px-2.5 py-1 rounded-lg">
+                              Status langsung Selesai (DELIVERED) · Tidak memotong stok chiller
+                            </div>
+                          )}
                           <div className="text-xs font-mono bg-[#FAF7F2] p-2.5 rounded-xl border border-[#E8E1D5] space-y-1">
                             <div>
                               Pemesan:{" "}

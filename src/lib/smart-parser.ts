@@ -22,6 +22,8 @@ export type ParsedAction =
       customerName: string;
       slotDate: string;
       slotLabel: string;
+      status?: "CONFIRMED_SLOT" | "DELIVERED";
+      isHistorical?: boolean;
       items: {
         sku: string;
         productName: string;
@@ -423,6 +425,7 @@ function parseOrderTokens(
 ): ParsedAction | null {
   let slotDate = getDateOffset(0);
   let slotLabel = "Hari Ini";
+  let isHistorical = false;
   const itemsMap = new Map<
     string,
     { sku: string; productName: string; quantity: number; unitPrice: number }
@@ -435,6 +438,30 @@ function parseOrderTokens(
     const tok = orderTokens[i];
     const tokLower = tok.toLowerCase();
 
+    if (["lama", "histori", "history", "selesai", "lunas", "done"].includes(tokLower)) {
+      isHistorical = true;
+      continue;
+    }
+    if (tokLower === "kemarin") {
+      slotDate = getDateOffset(-1);
+      slotLabel = "Kemarin";
+      isHistorical = true;
+      continue;
+    }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(tokLower)) {
+      slotDate = tokLower;
+      slotLabel = tokLower;
+      continue;
+    }
+    const shortDateMatch = tokLower.match(/^(\d{1,2})[\/\-](\d{1,2})$/);
+    if (shortDateMatch) {
+      const day = shortDateMatch[1].padStart(2, "0");
+      const month = shortDateMatch[2].padStart(2, "0");
+      const year = new Date().getFullYear();
+      slotDate = `${year}-${month}-${day}`;
+      slotLabel = `${day}/${month}/${year}`;
+      continue;
+    }
     if (tokLower === "besok" || levenshtein(tokLower, "besok") <= 1) {
       if (tokLower !== "besok") corrections.push({ original: tok, correctedTo: "besok" });
       slotDate = getDateOffset(1);
@@ -506,22 +533,28 @@ function parseOrderTokens(
     customerName,
     slotDate,
     slotLabel,
+    status: isHistorical ? "DELIVERED" : "CONFIRMED_SLOT",
+    isHistorical,
     items,
     totalAmount,
     corrections,
   };
 }
 
-  // 4. Order command: "order Budi 2 bento 1 matcha besok"
+  // 4. Order command: "order Budi 2 bento 1 matcha besok" or "histori Budi 2 ori 15/11"
   const isOrder =
-    ["order", "pesan", "ord", "beli"].includes(firstWord) ||
+    ["order", "pesan", "ord", "beli", "histori", "history"].includes(firstWord) ||
     levenshtein(firstWord, "order") <= 2;
 
   if (isOrder) {
-    if (firstWord !== "order" && firstWord !== "pesan") {
+    if (firstWord !== "order" && firstWord !== "pesan" && firstWord !== "histori" && firstWord !== "history") {
       corrections.push({ original: tokens[0], correctedTo: "order" });
     }
-    const parsedOrder = parseOrderTokens(tokens.slice(1), corrections);
+    const orderSlice =
+      firstWord === "histori" || firstWord === "history"
+        ? ["histori", ...tokens.slice(1)]
+        : tokens.slice(1);
+    const parsedOrder = parseOrderTokens(orderSlice, corrections);
     if (parsedOrder) return parsedOrder;
   }
 

@@ -403,6 +403,7 @@ export async function createQuickOrder(input: {
   slotDate: string;
   items: { sku: string; productName: string; quantity: number; unitPrice: number }[];
   notes?: string;
+  status?: OrderStatus;
 }): Promise<OrderRecord> {
   const orderId = `ord-${crypto.randomUUID().slice(0, 8)}`;
   const orderNumber = `NK-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -431,7 +432,7 @@ export async function createQuickOrder(input: {
     slotDate: input.slotDate,
     totalAmount,
     totalHpp,
-    status: "CONFIRMED_SLOT",
+    status: input.status || "CONFIRMED_SLOT",
     notes: input.notes,
     items: enrichedItems,
     createdAt: new Date().toISOString(),

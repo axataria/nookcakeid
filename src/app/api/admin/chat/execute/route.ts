@@ -22,7 +22,10 @@ export async function POST(req: NextRequest) {
         customerName: action.customerName,
         slotDate: action.slotDate,
         items: action.items,
-        notes: "Dicatat via Admin Quick Chat",
+        status: action.status,
+        notes: action.isHistorical
+          ? "Histori pesanan selesai (via Quick Chat)"
+          : "Dicatat via Admin Quick Chat",
       });
       return NextResponse.json({ ok: true, type: "ORDER", data: order });
     }
